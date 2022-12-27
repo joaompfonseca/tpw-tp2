@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>{{ header }}</h2>
+    <br>
+
+    {% if user.is_authenticated and user.username == 'admin' %}
+    <p>
+        <strong>Actions: </strong>
+        <a href="{% url 'teamleaders_edit' _id=teamleader.id %}">Edit Team Leader</a>
+    </p>
+    {% endif %}
+    <img src="{{ teamleader_image }}" alt="TeamLeader Image" style="width: auto; height: auto">
+    <p><b>Name: </b>{{ teamleader.name }}</p>
+    <p><b>Team: </b><a href="{% url 'teams_get' _id=teamleader.team.id %}">{{ teamleader.team.name }}</a></p>
+
+{% endblock %}

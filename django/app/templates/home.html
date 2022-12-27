@@ -1,0 +1,97 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <!-- ***** Banner Start ***** -->
+    <div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="header-text">
+                    <h1>Welcome To Formula 1</h1>
+                    <h4>Drive to Survive</h4>
+                </div>
+                <div class="row" style="padding-top: 30px">
+                    <div class="col-lg-4 col-md-4 col-sm-12 center-stuff">
+                        <a href="{% url 'pilots_list' %}">
+                            <div class="stats-circle center-stuff">
+                                <h5>{{ stats.total_pilots }} Pilots</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 center-stuff">
+                        <a href="{% url 'teams_list' %}">
+                            <div class="stats-circle center-stuff">
+                                <h5>{{ stats.total_teams }} Teams</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 center-stuff">
+                        <a href="{% url 'races_list' %}">
+                            <div class="stats-circle center-stuff">
+                                <h5>{{ stats.total_races }} Races</h5>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Banner End ***** -->
+
+    <!-- ***** Most Popular Start ***** -->
+    <div class="most-popular center-stuff">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-section">
+                    <h4 class="center-stuff" style="color: #EE0001">Pilots Leaderboard</h4>
+                </div>
+                <div class="row">
+                    <table style="border-collapse: separate; border-spacing: 1em; color: white">
+                        <tr>
+                            <th>Position</th>
+                            <th>Pilot</th>
+                            <th>Points</th>
+                        </tr>
+                        {% for p in pilots_leaderboard %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><a href="{% url 'pilots_get' _id=p.pilot.id %}">{{ p.pilot.name }}</a></td>
+                                <td>{{ p.points }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="most-popular center-stuff">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-section">
+                    <h4 class="center-stuff" style="color: #EE0001">Teams Leaderboard</h4>
+                </div>
+                <div class="row">
+                    <table style="border-collapse: separate; border-spacing: 1em; color: white">
+                        <tr>
+                            <th>Position</th>
+                            <th>Team</th>
+                            <th>Points</th>
+                        </tr>
+                        {% for t in teams_leaderboard %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><a href="{% url 'teams_get' _id=t.team.id %}">{{ t.team.name }}</a></td>
+                                <td>{{ t.points }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Most Popular End ***** -->
+
+
+{% endblock %}

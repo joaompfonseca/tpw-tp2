@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="row">
+        <h2>{{ header }}</h2>
+        {% if user.is_authenticated %}
+            {% if favourite %}
+                <a href="{% url 'pilot_remove_from_favourite' pilot_id=pilot.id %}">
+                    <img src="{{ like_image }}" alt="Like Image" style="width: 25px; height: 23px;
+                    margin-top: 9px; margin-left: 10px">
+                </a>
+            {% else %}
+                <a href="{% url 'pilot_add_to_favourite' pilot_id=pilot.id %}">
+                    <img src="{{ dislike_image }}" alt="Dislike Image" style="width: 25px; height: 22px;
+                    margin-top: 9px; margin-left: 10px">
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+    <br>
+
+    {% if user.is_authenticated and user.username == 'admin' %}
+        <p>
+            <strong>Actions: </strong>
+            <a href="{% url 'pilots_edit' _id=pilot.id %}">Edit Pilot</a>
+            -
+            <a href="{% url 'results_new' %}">New Result</a>
+        </p>
+    {% endif %}
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12" style="padding-bottom: 30px">
+            <img src="{{ pilot_image }}" alt="Pilot Image" style="width: 206px; height: 206px">
+            <p style="padding-top: 10px"><b>Name: </b> {{ pilot.name }}</p>
+            <p><b>Birth Date: </b> {{ pilot.date }}</p>
+            <p><b>Victories: </b> {{ pilot.victories }}</p>
+            <p><b>Pole Positions: </b> {{ pilot.pole_positions }}</p>
+            <p><b>Championships: </b> {{ pilot.championships }}</p>
+            <p><b>Contract: </b> {{ pilot.contract }}</p>
+            <p><b>Entry Year: </b> {{ pilot.entry_year }}</p>
+            <p><b>Team: </b> <a href="{% url 'teams_get' _id=pilot.team.id %}">{{ pilot.team.name }}</a></p>
+            <p><b>Country(ies): </b>
+                {% for c in pilot.country.all %}
+                    <a href="{% url 'countries_get' _id=c.id %}">{{ c.designation }} ({{ c.code }})</a>
+                    {% if not forloop.last %}, {% endif %} {# Separate countries with commas #}
+                {% endfor %}
+            </p>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h4 style="padding-bottom: 20px">Pilot's Results</h4>
+            <table style="border-collapse: separate; border-spacing: 1em; color: white">
+                <tr>
+                    <th>Position</th>
+                    <th>Race</th>
+                    <th>Points</th>
+                    {% if user.is_authenticated and user.username == 'admin' %}
+                        <th>Actions</th>
+                    {% endif %}
+                </tr>
+                {% for r in results %}
+                    <tr>
+                        <td>{{ r.position }}</td>
+                        <td><a href="{% url 'races_get' _id=r.race.id %}">{{ r.race }}</a></td>
+                        <td>{{ r.points }}</td>
+                        {% if user.is_authenticated and user.username == 'admin' %}
+                            <td><a href="{% url 'results_edit' _id=r.id %}">Edit</a></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td><b>Total Points:</b></td>
+                    <td><b>{{ pilot.total_points }}</b></td>
+                    {% if user.is_authenticated and user.username == 'admin' %}
+                        <td></td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,41 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>{{ header }}</h2>
+    <br>
+
+    {% if actions %}
+    <p>
+        <strong>Actions:</strong>
+        {% for action in actions %}
+            <a href="{{ action.url }}">{{ action.str }}</a>
+            {% if not forloop.last %} - {% endif %} {# Separate actions with hyphens #}
+        {% endfor %}
+    </p>
+    {% endif %}
+
+    {% if query %}
+        <p>Search by: <strong>{{ query }}</strong></p>
+    {% endif %}
+
+    {% if list %}
+        <p>Found {{ list|length }} result{{ list|pluralize }}.</p>
+        <!-- ***** Gaming Library Start ***** -->
+        <div class="gaming-library">
+            <div class="col-lg-12">
+                {% for group in list %}
+                    <div class="item">
+                        {% for element in group %}
+                            <a href="{{ element.url }}">{{ element.str }}</a>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- ***** Gaming Library End ***** -->
+    {% else %}
+        <p>Not found any result.</p>
+    {% endif %}
+
+{% endblock %}

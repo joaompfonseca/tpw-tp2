@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>{{ header }}</h2>
+    <br>
+
+    {% if user.is_authenticated and user.username == 'admin' %}
+        <p>
+            <strong>Actions: </strong>
+            <a href="{% url 'races_edit' _id=race.id %}">Edit Race</a>
+            -
+            <a href="{% url 'results_new' %}">New Result</a>
+        </p>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12" style="padding-bottom: 30px">
+            <p><b>Name: </b>{{ race.name }}</p>
+            <p><b>Date: </b>{{ race.date }}</p>
+            <p><b>Season: </b>{{ race.season }}</p>
+            <p><b>Circuit: </b><a href="{% url 'circuits_get' _id=race.circuit.id %}">{{ race.circuit.name }}</a></p>
+            <p><b>Fast Lap: </b>{{ race.fast_lap|date:"i:s" }}</p>
+        </div>
+        {% if results %}
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <h4 style="padding-bottom: 20px">Race Results</h4>
+                <table style="border-collapse: separate; border-spacing: 1em; color: white; margin-bottom: -1em">
+                    <tr>
+                        <th>Position</th>
+                        <th>Pilot</th>
+                        <th>Points</th>
+                        {% if user.is_authenticated and user.username == 'admin' %}
+                            <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                    {% for r in results %}
+                        <tr>
+                            <td>{{ r.position }}</td>
+                            <td><a href="{% url 'pilots_get' _id=r.pilot.id %}">{{ r.pilot.name }}</a></td>
+                            <td>{{ r.points }}</td>
+                            {% if user.is_authenticated and user.username == 'admin' %}
+                                <td>
+                                    <a href="{% url 'results_edit' _id=r.id %}">Edit</a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+
+{% endblock %}

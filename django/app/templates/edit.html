@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>{{ header }}</h2>
+    <br>
+
+    <div class="gaming-library">
+        <table class="col-lg-12">
+            <form action="." method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <table style="border-collapse: separate; border-spacing: 1em; color: white">
+                    {% for field in form %}
+                        <tr>
+                            <th>{{ field.label_tag }}</th>
+                            <td>{{ field }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <input type="submit" value="Update" class="btn btn-primary">
+            </form>
+    </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>{{ header }}</h2>
+    <br>
+
+    <div class="gaming-library">
+        <div class="col-lg-12">
+            <form action="." method="post">
+                {% csrf_token %}
+                <div class="ui-widget">
+                    <div class="form-group row">
+                    {% for field in form %}
+                        <p>
+                            {{ field.label_tag }}
+                            {{ field }}
+                        </p>
+                        <br>
+                    {% endfor %}
+                    </div>
+                </div>
+                <input type="submit" value="Search" class="btn btn-primary">
+            <script>
+          $( function() {
+            var availableTags = [
+                {% for op in options %}
+                    {% if id_field == "id_designation" %}
+                    "{{ op.designation }}",
+                    {% elif id_field == "id_model" %}
+                    "{{ op.model }}",
+                    {% else %}
+                    "{{ op.name }}",
+                    {% endif %}
+                {% endfor %}
+            ];
+            $( "#{{ id_field }}" ).autocomplete({
+              source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableTags, request.term);
+                response(results.slice(0, 3));
+              }
+            });
+          } );
+          </script>
+            {% if id_field2 %}
+                <script>
+          $( function() {
+            var availableTags = [
+                {% for op in options %}
+                    "{{ op.pilot.name }}",
+                {% endfor %}
+            ];
+            $( "#{{ id_field2 }}" ).autocomplete({
+              source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableTags, request.term);
+                response(results.slice(0, 3));
+              }
+            });
+          } );
+          </script>
+            {% endif %}
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% load static %}
+
+{% if user.is_authenticated %}
+
+    <li>
+        <a href="{% url 'profile' %}">
+            Hello <strong>{{ user.username }}</strong> !
+            <img src="{% static image %}">
+        </a>
+    </li>
+
+{% else %}
+
+    <li>
+        <a href="{% url 'login' %}">
+            Log In
+            <img src="{% static '/images/profile-header-none.jpg' %}">
+        </a>
+    </li>
+
+{% endif %}

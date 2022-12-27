@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>{{ header }}</h2>
+    <br>
+
+    {% if user.is_authenticated and user.username == 'admin' %}
+    <p>
+        <strong>Actions: </strong>
+        <a href="{% url 'countries_edit' _id=country.id %}">Edit Country</a>
+    </p>
+    {% endif %}
+
+    <p><b>Designation: </b>{{ country.designation }}</p>
+    <p><b>Code: </b>{{ country.code }}</p>
+
+    {% if circuits %}
+    <p><b>Circuits: </b>
+        {% for c in circuits %}
+        <a href="{% url 'circuits_get' _id=c.id %}">{{ c.name }}</a>
+        {% if not forloop.last %} - {% endif %} {# Separate elements in a group with hyphens #}
+        {% endfor %}
+    </p>
+    {% endif %}
+
+    {% if pilots %}
+    <p><b>Pilots: </b>
+        {% for p in pilots %}
+        <a href="{% url 'pilots_get' _id=p.id %}">{{ p.name }}</a>
+        {% if not forloop.last %} - {% endif %} {# Separate elements in a group with hyphens #}
+        {% endfor %}
+    </p>
+    {% endif %}
+
+
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>{{ header }}</h2>
+    <br>
+
+    {% if user.is_authenticated and user.username == 'admin' %}
+    <p>
+        <strong>Actions: </strong>
+        <a href="{% url 'results_edit' _id=result.id %}">Edit Result</a>
+    </p>
+    {% endif %}
+
+    <p><b>Position: </b>{{ result.position }}</p>
+    <p><b>Pilot: </b><a href="{% url 'pilots_get' _id=result.pilot.id %}">{{ result.pilot.name }}</a></p>
+    <p><b>Race: </b><a href="{% url 'races_get' _id=result.race.id %}">{{ result.race.name }}</a></p>
+    <p><b>Points: </b>{{ result.points }}</p>
+
+{% endblock %}

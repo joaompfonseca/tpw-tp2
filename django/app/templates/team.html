@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <div class="row">
+        <h2>{{ header }}</h2>
+        {% if user.is_authenticated %}
+            {% if favourite %}
+                <a href="{% url 'team_remove_from_favourite' team_id=team.id %}">
+                    <img src="{{ like_image }}" alt="Like Image" style="width: 25px; height: 23px;
+                        margin-top: 9px; margin-left: 10px">
+                </a>
+            {% else %}
+                <a href="{% url 'team_add_to_favourite' team_id=team.id %}">
+                    <img src="{{ dislike_image }}" alt="Dislike Image" style="width: 25px; height: 22px;
+                        margin-top: 9px; margin-left: 10px">
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+    <br>
+
+    {% if user.is_authenticated and user.username == 'admin' %}
+        <p>
+            <strong>Actions: </strong>
+            <a href="{% url 'teams_edit' _id=team.id %}">Edit Team</a>
+        </p>
+    {% endif %}
+
+    <img class="rounded float-right" src="{{ team_image }}" alt="Team Image"
+         style="float:right; width:320px; height:180px">
+
+    <p><b>Name: </b>{{ team.name }}</p>
+    <p><b>Foundation Date: </b>{{ team.date }}</p>
+    <p><b>Championships: </b>{{ team.championships }}</p>
+
+    {% if team.teamleader %}
+        <p><b>Team Leader: </b><a
+                href="{% url 'teamleaders_get' _id=team.teamleader.id %}">{{ team.teamleader.name }}</a></p>
+    {% endif %}
+    <p><b>Pilots: </b>
+        {% for p in pilots %}
+            <a href="{% url 'pilots_get' _id=p.id %}">{{ p.name }}</a>
+            {% if not forloop.last %} - {% endif %} {# Separate elements in a group with hyphens #}
+        {% endfor %}
+    </p>
+    <p><b>Current Championship Points: </b>{{ team_points }}</p>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div>
+
+                    <!-- ***** Banner Start ***** -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="main-profile">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <img src="{% static image %}" alt="profile picture"
+                                             style="border-radius: 23px;">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <table style="border-collapse: separate; border-spacing: 1em; color: white">
+                                            <tr>
+                                                <th>Id</th>
+                                                <td>{{ user_id }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Username</th>
+                                                <td>{{ user.username }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Name</th>
+                                                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Email</th>
+                                                <td>{{ user.email }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Biography</th>
+                                                <td>{{ biography }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a role="button" class="btn btn-info"
+                                                       href="{% url 'profile_edit' %}">Edit</a>
+                                                    <a role="button" class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="container clips">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h4>Your Favourite Pilots</h4>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            {% if pilots.all|length > 0 %}
+                                                {% for pilot in pilots.all %}
+                                                    <div class="col-lg-4 col-md-6 col-sm-12 center-stuff">
+                                                        <a href="{% url 'pilots_get' _id=pilot.id %}">
+                                                            <div class="">
+                                                                <div class="thumb">
+                                                                    <img src="/static/images/{{ pilot.name }}.png"
+                                                                         alt="" style="border-radius: 23px;
+                                        width: 206px; height: 206px">
+                                                                </div>
+                                                                <p class="center-stuff"><b>{{ pilot.name }}</b></p>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <p>You have no pilot favourites yet.</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="container clips">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h4>Your Favourite Teams</h4>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            {% if teams.all|length > 0 %}
+                                                {% for team in teams.all %}
+                                                    <div class="col-lg-6 col-md-6 col-sm-12 center-stuff">
+                                                        <a href="{% url 'teams_get' _id=team.id %}">
+                                                            <div class="thumb">
+                                                                <img src="/static/images/{{ team.name }}.png" alt=""
+                                                                     style="border-radius: 23px;
+                                        width: 320px; height: 180px">
+                                                                <p class="center-stuff"><b>{{ team.name }}</b></p>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <p>You have no team favourites yet.</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ***** Banner End ***** -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

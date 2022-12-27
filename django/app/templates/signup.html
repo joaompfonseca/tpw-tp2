@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <h2>Sign up</h2>
+    <br>
+
+    <div class="gaming-library">
+        <div class="col-lg-12">
+            <form action="." method="post">
+                {% csrf_token %}
+                <table style="border-collapse: separate; border-spacing: 1em; color: white">
+                    <tr>
+                        <th>{{ form.username.label_tag }}</th>
+                        <td>{{ form.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ form.password1.label_tag }}</th>
+                        <td>{{ form.password1 }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ form.password2.label_tag }}</th>
+                        <td>{{ form.password2 }}</td>
+                    </tr>
+                </table>
+                <button type="submit" class="btn btn-primary">Sign up</button>
+            </form>
+            {% if form.errors %}
+                <p class="validation-summary-errors" style="color: #a80000">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            {{ error }}<br>
+                        {% endfor %}
+                    {% endfor %}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

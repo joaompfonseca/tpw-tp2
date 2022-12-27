@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>{{ header }}</h2>
+    <br>
+
+    {% if user.is_authenticated and user.username == 'admin' %}
+        <p>
+            <strong>Actions: </strong>
+            <a href="{% url 'circuits_edit' _id=circuit.id %}">Edit Circuit</a>
+        </p>
+    {% endif %}
+
+    <p><b>Name: </b>{{ circuit.name }}</p>
+    <p><b>Length: </b>{{ circuit.length }}</p>
+    <p><b>Location: </b>{{ circuit.location }}</p>
+    <p><b>Last Winner: </b><a
+            href="{% url 'pilots_get' _id=circuit.last_winner.id %}">{{ circuit.last_winner.name }}</a></p>
+    <p><b>Country: </b><a href="{% url 'countries_get' _id=circuit.country.id %}">{{ circuit.country.designation }}</a>
+    </p>
+    {% if races %}
+        <p><b>Races: </b>
+            {% for r in races %}
+                <a href="{% url 'races_get' _id=r.id %}">{{ r.name }}</a>
+                {% if not forloop.last %} - {% endif %} {# Separate elements in a group with hyphens #}
+            {% endfor %}
+        </p>
+    {% endif %}
+
+{% endblock %}
