@@ -20,6 +20,7 @@ import { SearchComponent } from './search/search.component';
 import { SignupComponent } from './signup/signup.component';
 import { TeamComponent } from './team/team.component';
 import { TeamleaderComponent } from './teamleader/teamleader.component';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { TeamleaderComponent } from './teamleader/teamleader.component';
     TeamleaderComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
