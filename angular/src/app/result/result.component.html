@@ -1,1 +1,14 @@
-<p>result works!</p>
+<h2>{{ header }}</h2>
+<br>
+
+<div *ngIf="user.is_authenticated && user.is_superuser">
+  <p>
+    <strong>Actions: </strong>
+    <a routerLink="/results/{{result.id}}/edit">Edit Result</a>
+  </p>
+</div>
+
+<p><b>Position: </b>{{ result.position }}</p>
+<p><b>Pilot: </b><a routerLink="/pilots/{{result.pilot.id}}">{{ result.pilot.name }}</a></p>
+<p><b>Race: </b><a routerLink="/races/{{result.race.id}}">{{ result.race.name }}</a></p>
+<p><b>Points: </b>{{ result.points }}</p>

@@ -1,1 +1,34 @@
-<p>team works!</p>
+<div class="row">
+  <h2>{{ header }}</h2>
+  <a *ngIf="user.is_authenticated" [routerLink]="['/teams/', team.id, 'favourite']">
+    <img src="{{ favourite ? like_image : dislike_image }}" alt="{{ favourite ? 'Like' : 'Dislike' }} Image"
+         style="width: 25px; height: 23px; margin-top: 9px; margin-left: 10px">
+  </a>
+</div>
+<br>
+
+<p *ngIf="user.is_authenticated && user.username == 'admin'">
+  <strong>Actions: </strong>
+  <a [routerLink]="['/teams/edit', team.id]">Edit Team</a>
+</p>
+
+<img class="rounded float-right" src="{{ team_image }}" alt="Team Image"
+     style="float:right; width:320px; height:180px">
+
+<p><b>Name: </b>{{ team.name }}</p>
+<p><b>Foundation Date: </b>{{ team.date }}</p>
+<p><b>Championships: </b>{{ team.championships }}</p>
+
+<ng-container *ngIf="team.teamleader">
+  <p><b>Team Leader: </b><a rrouterLink="/teamleaders/{{team.teamleader.id}}">{{ team.teamleader.name }}</a></p>
+</ng-container>
+
+<ng-container *ngIf="pilots.length > 0">
+  <p><b>Pilots: </b>
+    <ng-container *ngFor="let p of pilots; let last=last">
+      <a routerLink="/pilots/{{p.id}}">{{ p.name }}</a>
+      <ng-container *ngIf="!last"> -</ng-container>
+    </ng-container>
+  </p>
+</ng-container>
+<p><b>Current Championship Points: </b>{{ team_points }}</p>

@@ -1,1 +1,23 @@
-<p>circuit works!</p>
+<h2>{{ header }}</h2>
+<br>
+
+<ng-container *ngIf="user.is_authenticated && user.is_superuser">
+  <p>
+    <strong>Actions: </strong>
+    <a routerLink="['/circuits/{{circuit.id}}/edit">Edit Circuit</a>
+  </p>
+</ng-container>
+
+<p><b>Name: </b>{{ circuit.name }}</p>
+<p><b>Length: </b>{{ circuit.length }}</p>
+<p><b>Location: </b>{{ circuit.location }}</p>
+<p><b>Last Winner: </b><a routerLink="/pilots/{{circuit.lastWinner.id}}">{{ circuit.lastWinner.name }}</a></p>
+<p><b>Country: </b><a routerLink="/countries{{circuit.country.id}}">{{ circuit.country.designation }}</a></p>
+<ng-container *ngIf="races.length > 0">
+  <p><b>Races: </b>
+    <ng-container *ngFor="let r of races; let last=last">
+      <a routerLink="/races/{{r.id}}">{{ r.name }}</a>
+      <ng-container *ngIf="!last"> -</ng-container>
+    </ng-container>
+  </p>
+</ng-container>
