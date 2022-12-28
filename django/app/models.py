@@ -16,6 +16,7 @@ class Team(models.Model):
     name = models.CharField(max_length=70)
     date = models.DateField()
     championships = models.IntegerField()
+    image = models.ImageField(upload_to='app/static/images/teams/', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -32,6 +33,7 @@ class Pilot(models.Model):
     entry_year = models.IntegerField()
     team = models.ForeignKey(Team, on_delete=models.RESTRICT)
     country = models.ManyToManyField(Country)
+    image = models.ImageField(upload_to='app/static/images/pilots/', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -86,6 +88,7 @@ class Result(models.Model):
 class TeamLeader(models.Model):
     name = models.CharField(max_length=70)
     team = models.OneToOneField(Team, on_delete=models.RESTRICT)
+    image = models.ImageField(upload_to='app/static/images/team_leaders/', null=True, blank=True)
 
     def __str__(self):
         return self.name

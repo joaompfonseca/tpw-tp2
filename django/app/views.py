@@ -3,10 +3,13 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
 from django.shortcuts import render, redirect
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from app.models import *
 from app.forms import *
-
+from app.serializers import *
 
 # Create your views here.
 
@@ -139,37 +142,56 @@ def team_remove_from_favourite(req, team_id):
 
 # Car
 
-def cars_list(req):
+@api_view(['GET'])
+def get_cars(req):
     cars = Car.objects.all()
-    actions = [{'str': 'Search Car', 'url': '/cars/search'}]
-    if req.user.is_authenticated and req.user.username == 'admin':
-        actions += [{'str': 'New Car', 'url': '/cars/new'}]
-    lst = [[{'str': c.model, 'url': f'/cars/{c.id}'}] for c in cars]
+    serializer = CarSerializer(cars, many=True)
+    return Response(serializer.data)
 
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Cars', 'actions': actions, 'list': lst}
-    return render(req, 'list.html', ctx)
+@api_view(['POST'])
+def car_create(req):
+    serializer = CarSerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def cars_new(req):
-    if req.method == 'POST':
-        form = CarForm(req.POST)
-        if form.is_valid():
-            Car.objects.create(
-                model=form.cleaned_data['model'],
-                engine=form.cleaned_data['engine'],
-                weight=form.cleaned_data['weight'],
-                pilot=form.cleaned_data['pilot']
-            )
-
-            return redirect('cars_list')
-    else:
-        form = CarForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'New Car', 'form': form}
-        return render(req, 'new.html', ctx)
+@api_view(['GET'])
+def car_search(req):
+    model = str(req.GET['model'])
+    pilot = str(req.GET['pilot'])
+    cars = Car.objects.filter(Q(model__icontains=model)
+                                      & Q(pilot__name__icontains=pilot))
+    #print(cars1)
+    #query = f'Car.model={model};Car.pilot={pilot}'
+    #if 'searched' in req.session:
+    #    print("here")
+    #    if query in req.session['searched'].keys():
+    #        print("here2")
+    #        cars = req.session['searched'][query]
+    #    else:
+    #        print("here3")
+    #        cars = Car.objects.filter(Q(model__icontains=model)
+    #                                  & Q(pilot__name__icontains=pilot))
+    #        if len(req.session['searched']) >= 10:
+    #            (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+    #        print("before")
+    #        req.session['searched'][query] = cars
+    #        req.session.save()
+    #        print("after")
+    #else:
+    #    print("there")
+    #    model = str(req.GET['model'])
+    #    pilot = str(req.GET['pilot'])
+    #    req.session['searched'] = dict()
+    #    # make query
+    #    cars = Car.objects.filter(Q(model__icontains=model)
+    #                              & Q(pilot__name__icontains=pilot))
+    #    req.session['searched'][query] = cars
+    #print(cars)
+    serializer = CarSerializer(cars, many=True)
+    return Response(serializer.data)
 
 
 def cars_search(req):
@@ -227,52 +249,47 @@ def cars_search(req):
         return render(req, 'search.html', ctx)
 
 
-def cars_get(req, _id):
-    car = Car.objects.get(id=_id)
+@api_view(['GET'])
+def get_car(req):
+    id = str(req.GET['id'])
+    try:
+        car = Car.objects.get(id=id)
+    except Car.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = CarSerializer(car)
+    return Response(serializer.data)
 
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Car Details', 'car': car}
-    return render(req, 'car.html', ctx)
 
-
-def cars_edit(req, _id):
-    car = Car.objects.get(id=_id)
-    if req.method == 'POST':
-        form = CarForm(req.POST)
-        if form.is_valid():
-            car.model = form.cleaned_data['model']
-            car.engine = form.cleaned_data['engine']
-            car.weight = form.cleaned_data['weight']
-            car.pilot = form.cleaned_data['pilot']
-            car.save()
-
-            return redirect('cars_get', _id=_id)
-    else:
-        form = CarForm(initial={
-            'model': car.model,
-            'engine': car.engine,
-            'weight': car.weight,
-            'pilot': car.pilot})
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Car', 'form': form}
-        return render(req, 'edit.html', ctx)
+@api_view(['PUT'])
+def update_car(req):
+    id = str(req.GET['id'])
+    try:
+        car = Car.objects.get(id=id)
+    except Car.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = CarSerializer(car, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Circuit
 
-def circuits_list(req):
+@api_view(['GET'])
+def get_circuits(req):
     circuits = Circuit.objects.all()
-    actions = [{'str': 'Search Circuit', 'url': '/circuits/search'}]
-    if req.user.is_authenticated and req.user.username == 'admin':
-        actions += [{'str': 'New Circuit', 'url': '/circuits/new'}]
-    lst = [[{'str': c.name, 'url': f'/circuits/{c.id}'}] for c in circuits]
+    print(circuits[0].id)
+    serializer = CircuitSerializer(circuits, many=True)
+    return Response(serializer.data)
 
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'List of Circuits', 'actions': actions, 'list': lst}
-    return render(req, 'list.html', ctx)
+
+@api_view(['GET'])
+def search_circuits(req):
+    name = str(req.GET['name'])
+    circuits = Circuit.objects.filter(name__icontains=name)
+    serializer = CircuitSerializer(circuits, many=True)
+    return Response(serializer.data)
 
 
 def circuits_search(req):
@@ -328,111 +345,85 @@ def circuits_search(req):
         return render(req, 'search.html', ctx)
 
 
-def circuits_get(req, _id):
-    circuit = Circuit.objects.get(id=_id)
-    races = Race.objects.filter(circuit=circuit)
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Circuit Details', 'circuit': circuit, 'races': races}
-    return render(req, 'circuit.html', ctx)
+@api_view(['GET'])
+def get_circuit(req):
+    id = str(req.GET['id'])
+    try:
+        circuit = Circuit.objects.get(id=id)
+        races = Race.objects.filter(circuit=circuit)
+    except Circuit.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = CircuitSerializer(circuit)
+    serializer1 = RaceSerializer(races,many=True)
+    return Response({'circuit': serializer.data,'races': serializer1.data})
 
 
-def circuits_new(req):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    if req.method == 'POST':
-        form = CircuitForm(req.POST)
-        if form.is_valid():
-            Circuit.objects.create(
-                name=form.cleaned_data['name'],
-                length=form.cleaned_data['length'],
-                location=form.cleaned_data['location'],
-                last_winner=form.cleaned_data['last_winner'],
-                country=form.cleaned_data['country'],
-            )
-
-            return redirect('circuits_list')
-    else:
-        form = CircuitForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'New Circuit', 'form': form}
-        return render(req, 'new.html', ctx)
+@api_view(['POST'])
+def new_circuit(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    serializer = CircuitSerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def circuits_edit(req, _id):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    circuit = Circuit.objects.get(id=_id)
-    if req.method == 'POST':
-        form = CircuitForm(req.POST)
-        if form.is_valid():
-            circuit.name = form.cleaned_data['name']
-            circuit.length = form.cleaned_data['length']
-            circuit.location = form.cleaned_data['location']
-            circuit.last_winner = form.cleaned_data['last_winner']
-            circuit.country = form.cleaned_data['country']
-            circuit.save()
-
-            return redirect('circuits_get', _id=_id)
-    else:
-        form = CircuitForm(initial={
-            'name': circuit.name,
-            'length': circuit.length,
-            'location': circuit.location,
-            'last_winner': circuit.last_winner,
-            'country': circuit.country.id
-        })
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Circuit', 'form': form}
-        return render(req, 'edit.html', ctx)
+@api_view(['PUT'])
+def update_circuit(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    id = str(req.GET['id'])
+    try:
+        circuit = Circuit.objects.get(id=id)
+    except Circuit.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = CircuitSerializer(circuit, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Country
 
-def countries_list(req):
+@api_view(['GET'])
+def get_countries(req):
     countries = Country.objects.all()
-    actions = [{'str': 'Search Country', 'url': '/countries/search'}]
-    if req.user.is_authenticated and req.user.username == 'admin':
-        actions += [{'str': 'New Country', 'url': '/countries/new'}]
-    lst = [[{'str': c.designation, 'url': f'/countries/{c.id}'}] for c in countries]
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Countries', 'actions': actions, 'list': lst}
-    return render(req, 'list.html', ctx)
+    serializer = CountrySerializer(countries, many=True)
+    return Response(serializer.data)
 
 
-def countries_get(req, _id):
-    country = Country.objects.get(id=_id)
+@api_view(['GET'])
+def get_country(req):
+    id = str(req.GET['id'])
+    try:
+        country = Country.objects.get(id=id)
+        pilots = Pilot.objects.filter(country=country)
+    except Country.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = CountrySerializer(country)
+    serializer1 = PilotSerializer(pilots, many=True)
+    return Response({'country': serializer.data, 'pilots': serializer1.data})
 
-    circuits = Circuit.objects.filter(country=country)
-    pilots = Pilot.objects.filter(country=country)
 
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Country Details', 'country': country, 'circuits': circuits, 'pilots': pilots}
-    return render(req, 'country.html', ctx)
+@api_view(['POST'])
+def new_country(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    serializer = CountrySerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def countries_new(req):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    if req.method == 'POST':
-        form = CountryForm(req.POST)
-        if form.is_valid():
-            Country.objects.create(
-                designation=form.cleaned_data['designation'],
-                code=form.cleaned_data['code']
-            )
-
-            return redirect('countries_list')
-    else:
-        form = CountryForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'New Country', 'form': form}
-        return render(req, 'new.html', ctx)
+@api_view(['GET'])
+def search_countries(req):
+    name = str(req.GET['name'])
+    countries = Country.objects.filter(designation__icontains=name)
+    serializer = CountrySerializer(countries, many=True)
+    return Response(serializer.data)
 
 
 def countries_search(req):
@@ -487,43 +478,38 @@ def countries_search(req):
         return render(req, 'search.html', ctx)
 
 
-def countries_edit(req, _id):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    country = Country.objects.get(id=_id)
-    if req.method == 'POST':
-        form = CountryForm(req.POST)
-        if form.is_valid():
-            country.designation = form.cleaned_data['designation']
-            country.code = form.cleaned_data['code']
-            country.save()
-
-            return redirect('countries_get', _id=_id)
-    else:
-        form = CountryForm(initial={
-            'designation': country.designation,
-            'code': country.code
-        })
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Country', 'form': form}
-        return render(req, 'edit.html', ctx)
+@api_view(['PUT'])
+def update_country(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    id = str(req.GET['id'])
+    try:
+        country = Country.objects.get(id=id)
+    except Country.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = CountrySerializer(country, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Pilot
 
-def pilots_list(req):
+
+@api_view(['GET'])
+def get_pilots(req):
     pilots = Pilot.objects.all()
-    actions = [{'str': 'Search Pilot', 'url': '/pilots/search'}]
-    if req.user.is_authenticated and req.user.username == 'admin':
-        actions += [{'str': 'New Pilot', 'url': '/pilots/new'}]
+    serializer = PilotSerializer(pilots, many=True)
+    return Response(serializer.data)
 
-    lst = [[{'str': p.name, 'url': f'/pilots/{p.id}'}] for p in pilots]
 
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'List of Pilots', 'actions': actions, 'list': lst}
-    return render(req, 'list.html', ctx)
+@api_view(['GET'])
+def search_pilots(req):
+    name = str(req.GET['name'])
+    pilots = Pilot.objects.filter(name__icontains=name)
+    serializer = PilotSerializer(pilots, many=True)
+    return Response(serializer.data)
 
 
 def pilots_search(req):
@@ -578,107 +564,82 @@ def pilots_search(req):
         return render(req, 'search.html', ctx)
 
 
-def pilots_get(req, _id):
-    pilot = Pilot.objects.get(id=_id)
-    faved = None
-    if not isinstance(get_user(req), AnonymousUser):
-        if pilot in Profile.objects.get(user=get_user(req)).favourite_pilot.all():
-            faved = True
-        else:
-            faved = False
-
-    image = "/static/images/" + pilot.name + ".png"
-    dislike_image = "/static/images/like_button.png"
-    like_image = "/static/images/dislike_button.png"
-
-    results = Result.objects.filter(pilot=pilot).order_by('-race__date')
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Pilot Details', 'pilot': pilot, 'pilot_image': image, 'results': results, 'favourite': faved,
-           'dislike_image': dislike_image, 'like_image': like_image}
-    return render(req, 'pilot.html', ctx)
+@api_view(['GET'])
+def get_pilot(req):
+    id = str(req.GET['id'])
+    try:
+        pilot = Pilot.objects.get(id=id)
+        results = Result.objects.filter(pilot=pilot).order_by('-race__date')
+    except Pilot.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = PilotSerializer(pilot)
+    serializer1 = ResultSerializer(results, many=True)
+    return Response({'pilot': serializer.data, 'results': serializer1.data})
 
 
-def pilots_new(req):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    if req.method == 'POST':
-        form = PilotForm(req.POST)
-        if form.is_valid():
-            pilot = Pilot.objects.create(
-                name=form.cleaned_data['name'],
-                date=form.cleaned_data['date'],
-                victories=form.cleaned_data['victories'],
-                pole_positions=form.cleaned_data['pole_positions'],
-                podiums=form.cleaned_data['podiums'],
-                championships=form.cleaned_data['championships'],
-                contract=form.cleaned_data['contract'],
-                entry_year=form.cleaned_data['entry_year'],
-                team=form.cleaned_data['team']
-            )
-            pilot.country.set(form.cleaned_data['country'])
-
-            return redirect('pilots_list')
-    else:
-        form = PilotForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'New Pilot', 'form': form}
-        return render(req, 'new.html', ctx)
+##def pilots_get(req, _id):
+##    pilot = Pilot.objects.get(id=_id)
+##    faved = None
+##    if not isinstance(get_user(req), AnonymousUser):
+##        if pilot in Profile.objects.get(user=get_user(req)).favourite_pilot.all():
+##            faved = True
+##        else:
+##            faved = False
+##
+##    image = "/static/images/" + pilot.name + ".png"
+##    dislike_image = "/static/images/like_button.png"
+##    like_image = "/static/images/dislike_button.png"
+##
+##    results = Result.objects.filter(pilot=pilot).order_by('-race__date')
+##    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
+##        -1] if req.user.is_authenticated else None,
+##           'header': 'Pilot Details', 'pilot': pilot, 'pilot_image': image, 'results': results, 'favourite': faved,
+##           'dislike_image': dislike_image, 'like_image': like_image}
+##    return render(req, 'pilot.html', ctx)
 
 
-def pilots_edit(req, _id):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    pilot = Pilot.objects.get(id=_id)
-    if req.method == 'POST':
-        form = PilotForm(req.POST)
-        if form.is_valid():
-            pilot.name = form.cleaned_data['name']
-            pilot.date = form.cleaned_data['date']
-            pilot.victories = form.cleaned_data['victories']
-            pilot.pole_positions = form.cleaned_data['pole_positions']
-            pilot.podiums = form.cleaned_data['podiums']
-            pilot.championships = form.cleaned_data['championships']
-            pilot.contract = form.cleaned_data['contract']
-            pilot.entry_year = form.cleaned_data['entry_year']
-            pilot.team = form.cleaned_data['team']
-            pilot.country.set(form.cleaned_data['country'])
-            pilot.save()
+@api_view(['POST'])
+def add_pilot(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    serializer = PilotSerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            return redirect('pilots_get', _id=_id)
-    else:
-        form = PilotForm(initial={
-            'name': pilot.name,
-            'date': pilot.date,
-            'victories': pilot.victories,
-            'pole_positions': pilot.pole_positions,
-            'podiums': pilot.podiums,
-            'championships': pilot.championships,
-            'contract': pilot.contract,
-            'entry_year': pilot.entry_year,
-            'team': pilot.team.id,
-            'country': [c.id for c in pilot.country.all()]
-        })
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Pilot', 'form': form}
-        return render(req, 'edit.html', ctx)
+
+@api_view(['PUT'])
+def update_pilot(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    id = str(req.GET['id'])
+    try:
+        pilot = Pilot.objects.get(id=id)
+    except Pilot.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = PilotSerializer(pilot, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Race
 
-def races_list(req):
+@api_view(['GET'])
+def get_races(req):
     races = Race.objects.all()
-    actions = [{'str': 'Search Race', 'url': '/races/search'}]
-    if req.user.is_authenticated and req.user.username == 'admin':
-        actions += [{'str': 'New Race', 'url': '/races/new'}]
-    lst = [[{'str': r.name, 'url': f'/races/{r.id}'}] for r in races]
+    serializer = RaceSerializer(races, many=True)
+    return Response(serializer.data)
 
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'List of Races', 'actions': actions, 'list': lst}
-    return render(req, 'list.html', ctx)
+
+@api_view(['GET'])
+def search_races(req):
+    name = str(req.GET['name'])
+    races = Race.objects.filter(name__icontains=name)
+    serializer = RaceSerializer(races, many=True)
+    return Response(serializer.data)
 
 
 def races_search(req):
@@ -734,66 +695,44 @@ def races_search(req):
         return render(req, 'search.html', ctx)
 
 
-def races_get(req, _id):
-    race = Race.objects.get(id=_id)
-    results = Result.objects.filter(race=race).order_by('position')
-
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Race Details', 'race': race, 'results': results}
-    return render(req, 'race.html', ctx)
-
-
-def races_new(req):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    if req.method == 'POST':
-        form = RaceForm(req.POST)
-        if form.is_valid():
-            Race.objects.create(
-                name=form.cleaned_data['name'],
-                date=form.cleaned_data['date'],
-                season=form.cleaned_data['season'],
-                fast_lap=form.cleaned_data['fast_lap'],
-                circuit=form.cleaned_data['circuit'],
-            )
-
-            return redirect('races_list')
-    else:
-        form = RaceForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'New Race', 'form': form}
-        return render(req, 'new.html', ctx)
+@api_view(['GET'])
+def get_race(req):
+    id = str(req.GET['id'])
+    try:
+        race = Race.objects.get(id=id)
+        results = Result.objects.filter(race=race).order_by('position')
+    except Race.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = RaceSerializer(race)
+    serializer1 = ResultSerializer(results, many=True)
+    return Response({'race': serializer.data, 'results': serializer1.data})
 
 
-def races_edit(req, _id):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    race = Race.objects.get(id=_id)
-    if req.method == 'POST':
-        form = RaceForm(req.POST)
-        if form.is_valid():
-            race.name = form.cleaned_data['name']
-            race.date = form.cleaned_data['date']
-            race.season = form.cleaned_data['season']
-            race.fast_lap = form.cleaned_data['fast_lap']
-            race.circuit = form.cleaned_data['circuit']
-            race.save()
+@api_view(['POST'])
+def new_race(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    serializer = RaceSerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            return redirect('races_get', _id=_id)
-    else:
-        form = RaceForm(initial={
-            'name': race.name,
-            'date': race.date,
-            'season': race.season,
-            'fast_lap': race.fast_lap,
-            'circuit': race.circuit.id
-        })
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Race', 'form': form}
-        return render(req, 'edit.html', ctx)
+
+@api_view(['PUT'])
+def update_race(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    id = str(req.GET['id'])
+    try:
+        race = Race.objects.get(id=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = RaceSerializer(race, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Result
@@ -835,323 +774,274 @@ def results_search(req):
 """
 
 
-def results_get(req, _id):
-    result = Result.objects.get(id=_id)
-
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Result Details', 'result': result}
-    return render(req, 'result.html', ctx)
-
-
-def results_new(req):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    if req.method == 'POST':
-        form = ResultForm(req.POST)
-        if form.is_valid():
-            result = Result.objects.create(
-                position=form.cleaned_data['position'],
-                pilot=form.cleaned_data['pilot'],
-                race=form.cleaned_data['race'],
-                points=form.cleaned_data['points']
-            )
-
-            return redirect('races_get', _id=result.race.id)
-    else:
-        form = ResultForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'New Result', 'form': form}
-        return render(req, 'new.html', ctx)
+@api_view(['GET'])
+def get_result(req):
+    id = str(req.GET['id'])
+    try:
+        result = Result.objects.get(id=id)
+    except Result.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = ResultSerializer(result)
+    return Response(serializer.data)
 
 
-def results_edit(req, _id):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    result = Result.objects.get(id=_id)
-    if req.method == 'POST':
-        form = ResultForm(req.POST)
-        if form.is_valid():
-            result.position = form.cleaned_data['position']
-            result.pilot = form.cleaned_data['pilot']
-            result.race = form.cleaned_data['race']
-            result.points = form.cleaned_data['points']
-            result.save()
+@api_view(['POST'])
+def new_result(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    serializer = ResultSerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            return redirect('races_get', _id=result.race.id)
-    else:
-        form = ResultForm(initial={
-            'position': result.position,
-            'pilot': result.pilot,
-            'race': result.race,
-            'points': result.points
-        })
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Result', 'form': form}
-        return render(req, 'edit.html', ctx)
+
+@api_view(['PUT'])
+def update_result(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    id = str(req.GET['id'])
+    try:
+        result = Result.objects.get(id=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = ResultSerializer(result, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Team
 
-def teams_list(req):
+
+@api_view(['GET'])
+def get_team(req):
+    #faved = None
+    #if not isinstance(get_user(req), AnonymousUser):
+    #    if team in Profile.objects.get(user=get_user(req)).favourite_team.all():
+    #        faved = True
+    #    else:
+    #        faved = False
+    id = str(req.GET['id'])
+    try:
+        team = Team.objects.get(id=id)
+        pilots = Pilot.objects.filter(team=team)
+    except Team.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = TeamSerializer(team)
+    serializer1 = PilotSerializer(pilots, many=True)
+    return Response({'team': serializer.data, 'pilots': serializer1.data})
+
+
+@api_view(['GET'])
+def search_team(req):
+    name = str(req.GET['name'])
+    try:
+        team = Team.objects.filter(name__icontains=name)
+    except Team.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = TeamSerializer(team, many=True)
+    return Response(serializer.data)
+
+
+#def teams_search(req):
+#    # If POST request, process form data
+#    if req.method == 'POST':
+#        # Create a form instance and pass data to it
+#        form = TeamSearchForm(req.POST)
+#        if form.is_valid():
+#            name = form.cleaned_data['name']
+#
+#            query = f'Team.name={name}'
+#
+#            if 'searched' in req.session:
+#                # print('I entered searched.')
+#                if query in req.session['searched'].keys():
+#                    lst = req.session['searched'][query]
+#                    # print("I entered cache")
+#                    # print(req.session['searched'].keys())
+#                else:
+#                    # print("I entered query")
+#                    teams = Team.objects.filter(name__icontains=name)
+#                    lst = [[{'str': t.name, 'url': f'/teams/{t.id}'}]
+#                           for t in teams]
+#                    # print(len(req.session['searched'].keys()))
+#                    if len(req.session['searched'].keys()) >= 10:
+#                        # print("I entered removed")
+#                        # removes first added element to cache
+#                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+#
+#                    req.session['searched'][query] = lst
+#                    req.session.save()
+#                    # print("Just added and saved session")
+#            else:
+#                # print("I entered have to initialize searched")
+#                req.session['searched'] = dict()
+#                # make query
+#                teams = Team.objects.filter(name__icontains=name)
+#                lst = [[{'str': t.name, 'url': f'/teams/{t.id}'}]
+#                       for t in teams]
+#                req.session['searched'][query] = lst
+#
+#            ctx = {
+#                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
+#                    -1] if req.user.is_authenticated else None,
+#                'header': 'List of Teams', 'list': lst, 'query': name}
+#            return render(req, 'list.html', ctx)
+#    else:
+#        # If GET (or any other method), create blank form
+#        form = TeamSearchForm()
+#        teams = Team.objects.all()
+#        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
+#            -1] if req.user.is_authenticated else None,
+#               'header': 'Search Team', 'form': form, 'options': teams, 'id_field': "id_name"}
+#        return render(req, 'search.html', ctx)
+
+
+@api_view(['GET'])
+def get_teams(req):
     teams = Team.objects.all()
-    actions = [{'str': 'Search Team', 'url': '/teams/search'}]
-    if req.user.is_authenticated and req.user.username == 'admin':
-        actions += [{'str': 'New Team', 'url': '/teams/new'}]
-    lst = [[{'str': t.name, 'url': f'/teams/{t.id}'}] for t in teams]
-
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'List of Teams', 'actions': actions, 'list': lst}
-    return render(req, 'list.html', ctx)
+    serializer = TeamSerializer(teams, many=True)
+    return Response(serializer.data)
 
 
-def teams_search(req):
-    # If POST request, process form data
-    if req.method == 'POST':
-        # Create a form instance and pass data to it
-        form = TeamSearchForm(req.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-
-            query = f'Team.name={name}'
-
-            if 'searched' in req.session:
-                # print('I entered searched.')
-                if query in req.session['searched'].keys():
-                    lst = req.session['searched'][query]
-                    # print("I entered cache")
-                    # print(req.session['searched'].keys())
-                else:
-                    # print("I entered query")
-                    teams = Team.objects.filter(name__icontains=name)
-                    lst = [[{'str': t.name, 'url': f'/teams/{t.id}'}]
-                           for t in teams]
-                    # print(len(req.session['searched'].keys()))
-                    if len(req.session['searched'].keys()) >= 10:
-                        # print("I entered removed")
-                        # removes first added element to cache
-                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-
-                    req.session['searched'][query] = lst
-                    req.session.save()
-                    # print("Just added and saved session")
-            else:
-                # print("I entered have to initialize searched")
-                req.session['searched'] = dict()
-                # make query
-                teams = Team.objects.filter(name__icontains=name)
-                lst = [[{'str': t.name, 'url': f'/teams/{t.id}'}]
-                       for t in teams]
-                req.session['searched'][query] = lst
-
-            ctx = {
-                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-                    -1] if req.user.is_authenticated else None,
-                'header': 'List of Teams', 'list': lst, 'query': name}
-            return render(req, 'list.html', ctx)
-    else:
-        # If GET (or any other method), create blank form
-        form = TeamSearchForm()
-        teams = Team.objects.all()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Search Team', 'form': form, 'options': teams, 'id_field': "id_name"}
-        return render(req, 'search.html', ctx)
+@api_view(['POST'])
+def new_team(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    serializer = TeamSerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def teams_get(req, _id):
-    team = Team.objects.get(id=_id)
-
-    faved = None
-    if not isinstance(get_user(req), AnonymousUser):
-        if team in Profile.objects.get(user=get_user(req)).favourite_team.all():
-            faved = True
-        else:
-            faved = False
-
-    dislike_image = "/static/images/like_button.png"
-    like_image = "/static/images/dislike_button.png"
-    image = "/static/images/" + team.name + ".png"
-
-    pilots = Pilot.objects.filter(team=team)
-
-    team_points = sum([p.total_points for p in pilots])
-
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Team Details', 'team': team, 'team_image': image, 'pilots': pilots, 'team_points': team_points,
-           'favourite': faved, 'dislike_image': dislike_image, 'like_image': like_image}
-    return render(req, 'team.html', ctx)
-
-
-def teams_new(req):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    if req.method == 'POST':
-        form = TeamForm(req.POST)
-        if form.is_valid():
-            Team.objects.create(
-                name=form.cleaned_data['name'],
-                date=form.cleaned_data['date'],
-                championships=form.cleaned_data['championships']
-            )
-
-            return redirect('teams_list')
-    else:
-        form = TeamForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'New Team', 'form': form}
-        return render(req, 'new.html', ctx)
-
-
-def teams_edit(req, _id):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    team = Team.objects.get(id=_id)
-    if req.method == 'POST':
-        form = TeamForm(req.POST)
-        if form.is_valid():
-            team.name = form.cleaned_data['name']
-            team.date = form.cleaned_data['date']
-            team.championships = form.cleaned_data['championships']
-            team.save()
-
-            return redirect('teams_get', _id=_id)
-    else:
-        form = TeamForm(initial={
-            'name': team.name,
-            'date': team.date,
-            'championships': team.championships
-        })
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Team', 'form': form}
-        return render(req, 'edit.html', ctx)
+@api_view(['PUT'])
+def update_team(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    id = str(req.GET['id'])
+    try:
+        team = Team.objects.get(id=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = TeamSerializer(team, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # TeamLeader
 
-def teamleaders_list(req):
+@api_view(['GET'])
+def get_teamleaders(req):
     teamleaders = TeamLeader.objects.all()
-    actions = [{'str': 'Search Team Leader', 'url': '/teamleaders/search'}]
-    if req.user.is_authenticated and req.user.username == 'admin':
-        actions += [{'str': 'New Team Leader', 'url': '/teamleaders/new'}]
-    lst = [[{'str': tl.name, 'url': f'/teamleaders/{tl.id}'}] for tl in teamleaders]
-
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'List of Team Leaders', 'actions': actions, 'list': lst}
-    return render(req, 'list.html', ctx)
+    serializer = TeamLeaderSerializer(teamleaders, many=True)
+    return Response(serializer.data)
 
 
-def teamleaders_search(req):
-    # If POST request, process form data
-    if req.method == 'POST':
-        # Create a form instance and pass data to it
-        form = TeamLeaderSearchForm(req.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-
-            query = f'TeamLeader.name={name}'
-            if 'searched' in req.session:
-                # print('I entered searched.')
-                if query in req.session['searched'].keys():
-                    lst = req.session['searched'][query]
-                    # print("I entered cache")
-                    # print(req.session['searched'].keys())
-                else:
-                    # print("I entered query")
-                    teamleaders = TeamLeader.objects.filter(name__icontains=name)
-
-                    lst = [[{'str': tl.name, 'url': f'/teamleaders/{tl.id}'}]
-                           for tl in teamleaders]
-                    # print(len(req.session['searched'].keys()))
-                    if len(req.session['searched'].keys()) >= 10:
-                        # print("I entered removed")
-                        # removes first added element to cache
-                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-
-                    req.session['searched'][query] = lst
-                    req.session.save()
-                    # print("Just added and saved session")
-            else:
-                print("I entered have to initialize searched")
-                req.session['searched'] = dict()
-                # make query
-                teamleaders = TeamLeader.objects.filter(name__icontains=name)
-
-                lst = [[{'str': tl.name, 'url': f'/teamleaders/{tl.id}'}]
-                       for tl in teamleaders]
-                req.session['searched'][query] = lst
-            ctx = {
-                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-                    -1] if req.user.is_authenticated else None,
-                'header': 'List of Team Leaders', 'list': lst, 'query': name}
-            return render(req, 'list.html', ctx)
-    else:
-        # If GET (or any other method), create blank form
-        form = TeamLeaderSearchForm()
-        teamleadres = TeamLeader.objects.all()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Search Team Leader', 'form': form, 'options': teamleadres, 'id_field': "id_name"}
-        return render(req, 'search.html', ctx)
+@api_view(['GET'])
+def search_teamleader(req):
+    name = str(req.GET['name'])
+    try:
+        teamleader = TeamLeader.objects.filter(name__icontains=name)
+    except TeamLeader.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = TeamLeaderSerializer(teamleader, many=True)
+    return Response(serializer.data)
 
 
-def teamleaders_get(req, _id):
-    teamleader = TeamLeader.objects.get(id=_id)
-    image = "/static/images/" + teamleader.name + ".jpeg"
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'header': 'Team Leader Details', 'teamleader': teamleader, 'teamleader_image': image}
-    return render(req, 'teamleader.html', ctx)
+#def teamleaders_search(req):
+#    # If POST request, process form data
+#    if req.method == 'POST':
+#        # Create a form instance and pass data to it
+#        form = TeamLeaderSearchForm(req.POST)
+#        if form.is_valid():
+#            name = form.cleaned_data['name']
+#
+#            query = f'TeamLeader.name={name}'
+#            if 'searched' in req.session:
+#                # print('I entered searched.')
+#                if query in req.session['searched'].keys():
+#                    lst = req.session['searched'][query]
+#                    # print("I entered cache")
+#                    # print(req.session['searched'].keys())
+#                else:
+#                    # print("I entered query")
+#                    teamleaders = TeamLeader.objects.filter(name__icontains=name)
+#
+#                    lst = [[{'str': tl.name, 'url': f'/teamleaders/{tl.id}'}]
+#                           for tl in teamleaders]
+#                    # print(len(req.session['searched'].keys()))
+#                    if len(req.session['searched'].keys()) >= 10:
+#                        # print("I entered removed")
+#                        # removes first added element to cache
+#                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+#
+#                    req.session['searched'][query] = lst
+#                    req.session.save()
+#                    # print("Just added and saved session")
+#            else:
+#                print("I entered have to initialize searched")
+#                req.session['searched'] = dict()
+#                # make query
+#                teamleaders = TeamLeader.objects.filter(name__icontains=name)
+#
+#                lst = [[{'str': tl.name, 'url': f'/teamleaders/{tl.id}'}]
+#                       for tl in teamleaders]
+#                req.session['searched'][query] = lst
+#            ctx = {
+#                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
+#                    -1] if req.user.is_authenticated else None,
+#                'header': 'List of Team Leaders', 'list': lst, 'query': name}
+#            return render(req, 'list.html', ctx)
+#    else:
+#        # If GET (or any other method), create blank form
+#        form = TeamLeaderSearchForm()
+#        teamleadres = TeamLeader.objects.all()
+#        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
+#            -1] if req.user.is_authenticated else None,
+#               'header': 'Search Team Leader', 'form': form, 'options': teamleadres, 'id_field': "id_name"}
+#        return render(req, 'search.html', ctx)
 
 
-def teamleaders_new(req):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    if req.method == 'POST':
-        form = TeamLeaderForm(req.POST)
-        if form.is_valid():
-            TeamLeader.objects.create(
-                name=form.cleaned_data['name'],
-                team=form.cleaned_data['team']
-            )
-
-            return redirect('teamleaders_list')
-    else:
-        form = TeamLeaderForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'New Team Leader', 'form': form}
-        return render(req, 'new.html', ctx)
+@api_view(['GET'])
+def get_teamleader(req):
+    id = str(req.GET['id'])
+    try:
+        teamleader = TeamLeader.objects.get(id=id)
+    except TeamLeader.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = TeamLeaderSerializer(teamleader)
+    return Response(serializer.data)
 
 
-def teamleaders_edit(req, _id):
-    if not req.user.is_authenticated or req.user.username != 'admin':
-        return redirect('login')
-    teamleader = TeamLeader.objects.get(id=_id)
-    if req.method == 'POST':
-        form = TeamLeaderForm(req.POST)
-        if form.is_valid():
-            teamleader.name = form.cleaned_data['name']
-            teamleader.team = form.cleaned_data['team']
-            teamleader.save()
+@api_view(['POST'])
+def new_teamleader(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    serializer = TeamLeaderSerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            return redirect('teamleaders_get', _id=_id)
-    else:
-        form = TeamLeaderForm(initial={
-            'name': teamleader.name,
-            'team': teamleader.team.id
-        })
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Team Leader', 'form': form}
-        return render(req, 'edit.html', ctx)
+
+def update_teamleader(req):
+    #if not req.user.is_authenticated or req.user.username != 'admin':
+    #    return redirect('login')
+    id = str(req.GET['id'])
+    try:
+        teamleader = TeamLeader.objects.get(id=id)
+    except TeamLeader.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = TeamLeaderSerializer(teamleader, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def template_index(req):
