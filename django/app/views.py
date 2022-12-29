@@ -6,35 +6,39 @@ from django.shortcuts import render, redirect
 from rest_framework import status, authentication, permissions, views, generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from app.models import *
 from app.forms import *
 from app.serializers import *
 
+
 # Create your views here.
 
 # Home
 
-def home(req):
-    pilots_leaderboard = []
-    teams_leaderboard = []
+# def home(req):
+#    pilots_leaderboard = []
+#    teams_leaderboard = []
+#
+#    stats = {'total_races': Race.objects.count(),
+#             'total_pilots': Pilot.objects.count(), 'total_teams': Team.objects.count()}
+#    for pilot in Pilot.objects.all():
+#        pilots_leaderboard.append({'pilot': pilot, 'points': pilot.total_points})
+#    pilots_leaderboard.sort(key=lambda x: x['points'], reverse=True)
+#
+#    for team in Team.objects.all():
+#        teams_leaderboard.append({'team': team,
+#                                  'points': sum([pilot.total_points for pilot in Pilot.objects.filter(team=team)])})
+#    teams_leaderboard.sort(key=lambda x: x['points'], reverse=True)
+#    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
+#        -1] if req.user.is_authenticated else None,
+#           'pilots_leaderboard': pilots_leaderboard, 'stats': stats, 'teams_leaderboard': teams_leaderboard}
+#    return render(req, 'home.html', ctx)
 
-    stats = {'total_races': Race.objects.count(),
-             'total_pilots': Pilot.objects.count(), 'total_teams': Team.objects.count()}
-    for pilot in Pilot.objects.all():
-        pilots_leaderboard.append({'pilot': pilot, 'points': pilot.total_points})
-    pilots_leaderboard.sort(key=lambda x: x['points'], reverse=True)
 
-    for team in Team.objects.all():
-        teams_leaderboard.append({'team': team,
-                                  'points': sum([pilot.total_points for pilot in Pilot.objects.filter(team=team)])})
-    teams_leaderboard.sort(key=lambda x: x['points'], reverse=True)
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'pilots_leaderboard': pilots_leaderboard, 'stats': stats, 'teams_leaderboard': teams_leaderboard}
-    return render(req, 'home.html', ctx)
+# AUTH
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -44,6 +48,8 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        user1 = authenticate(username=user.username, password=request.data['password'])
+        Profile.objects.create(user=user1, profile_image='/images/profiles/profile.jpg')
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
         })
@@ -68,122 +74,87 @@ class LogoutAPI(generics.GenericAPIView):
         logout(request)
         return Response(status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 def user_get(req):
     user = req.user
-    print(user)
     if user.is_authenticated:
-        return Response(status=status.HTTP_200_OK)
+        t = UserSerializer(user)
+        return Response(t.data)
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-# Auth
-#def signup(req):
-#    if req.method == 'POST':
-#        form = UserCreationForm(req.POST)
-#        if form.is_valid():
-#            form.save()
-#            username = form.cleaned_data.get('username')
-#            raw_password = form.cleaned_data.get('password1')
-#            user = authenticate(username=username, password=raw_password)
-#            Profile.objects.create(user=user,
-#                                   profile_image='/images/profiles/profile.jpg')
-#
-#            login(req, user)
-#            return redirect('home')
-#        else:
-#            ctx = {
-#                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-#                    -1] if req.user.is_authenticated else None,
-#                'form': form}
-#            return render(req, 'signup.html', ctx)
-#    else:
-#        form = UserCreationForm()
-#        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-#            -1] if req.user.is_authenticated else None,
-#               'form': form}
-#        return render(req, 'signup.html', ctx)
-
-
 # Profile
-def profile(req):
-    user_profile = Profile.objects.get(user=get_user(req))
-    ctx = {'image': 'images/profiles/' + user_profile.profile_image.url.split('/')[
-        -1] if req.user.is_authenticated else None,
-           'biography': user_profile.biography,
-           'pilots': user_profile.favourite_pilot,
-           'teams': user_profile.favourite_team,
-           'user_id': user_profile.id}
-    return render(req, 'profile.html', ctx)
 
 
-def profile_edit(req):
-    if not req.user.is_authenticated:
-        return redirect('login')
-    user_profile = Profile.objects.get(user=get_user(req))
-    if req.method == 'POST':
-        form = ProfileForm(req.POST, req.FILES)
-        if form.is_valid() or req.POST.get('profile_image') == '':
-            user_profile.user.first_name = form.cleaned_data['first_name']
-            user_profile.user.last_name = form.cleaned_data['last_name']
-            user_profile.user.email = form.cleaned_data['email']
-            user_profile.user.save()
-            if req.POST.get('profile_image') != '':
-                user_profile.profile_image = form.cleaned_data['profile_image']
-            user_profile.biography = form.cleaned_data['biography']
-            user_profile.save()
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_profile(req):
+    profile = Profile.objects.get(user=req.user)
+    t = ProfileSerializer(profile)
+    return Response(t.data)
 
-            return redirect('profile')
-    else:
-        form = ProfileForm(initial={
-            'first_name': user_profile.user.first_name,
-            'last_name': user_profile.user.last_name,
-            'email': user_profile.user.email,
-            'profile_image': user_profile.profile_image,
-            'biography': user_profile.biography
-        })
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Edit Profile', 'form': form}
-        return render(req, 'edit.html', ctx)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_profile(req):
+    profile = Profile.objects.get(user=req.user)
+    serializer = ProfileSerializer(profile, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Pilot Favourites
-def pilot_add_to_favourite(req, pilot_id):
-    user_profile = Profile.objects.get(user=get_user(req))
-    pilot = Pilot.objects.get(id=pilot_id)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def pilot_add_to_favourite(req):
+    user_profile = Profile.objects.get(user=req.user)
+    pilot = Pilot.objects.get(id=req.data['id'])
     user_profile.favourite_pilot.add(pilot)
     user_profile.save()
-    return redirect('pilots_get', _id=pilot_id)
+    return Response(status=status.HTTP_200_OK)
 
 
-def pilot_remove_from_favourite(req, pilot_id):
-    user_profile = Profile.objects.get(user=get_user(req))
-    pilot = Pilot.objects.get(id=pilot_id)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def pilot_remove_from_favourites(req):
+    user_profile = Profile.objects.get(user=req.user)
+    pilot = Pilot.objects.get(id=req.data['id'])
     user_profile.favourite_pilot.remove(pilot)
     user_profile.save()
-    return redirect('pilots_get', _id=pilot_id)
+    return Response(status=status.HTTP_200_OK)
 
 
 # Team Favourites
-def team_add_to_favourite(req, team_id):
-    user_profile = Profile.objects.get(user=get_user(req))
-    team = Team.objects.get(id=team_id)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def team_add_to_favourite(req):
+    user_profile = Profile.objects.get(user=req.user)
+    team = Team.objects.get(id=req.data['id'])
     user_profile.favourite_team.add(team)
     user_profile.save()
-    return redirect('teams_get', _id=team_id)
+    return Response(status=status.HTTP_200_OK)
 
 
-def team_remove_from_favourite(req, team_id):
-    user_profile = Profile.objects.get(user=get_user(req))
-    team = Team.objects.get(id=team_id)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def team_remove_from_favourites(req):
+    user_profile = Profile.objects.get(user=req.user)
+    team = Team.objects.get(id=req.data['id'])
     user_profile.favourite_team.remove(team)
     user_profile.save()
-    return redirect('teams_get', _id=team_id)
+    return Response(status=status.HTTP_200_OK)
 
 
 # Car
+
 
 @api_view(['GET'])
 def get_cars(req):
@@ -191,7 +162,9 @@ def get_cars(req):
     serializer = CarSerializer(cars, many=True)
     return Response(serializer.data)
 
+
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def car_create(req):
     serializer = CarSerializer(data=req.data)
     if serializer.is_valid():
@@ -238,6 +211,7 @@ def get_car(req):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def update_car(req):
     id = str(req.GET['id'])
     try:
@@ -293,14 +267,13 @@ def get_circuit(req):
     except Circuit.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CircuitSerializer(circuit)
-    serializer1 = RaceSerializer(races,many=True)
-    return Response({'circuit': serializer.data,'races': serializer1.data})
+    serializer1 = RaceSerializer(races, many=True)
+    return Response({'circuit': serializer.data, 'races': serializer1.data})
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def new_circuit(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     serializer = CircuitSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -309,9 +282,8 @@ def new_circuit(req):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def update_circuit(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     id = str(req.GET['id'])
     try:
         circuit = Circuit.objects.get(id=id)
@@ -347,9 +319,8 @@ def get_country(req):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def new_country(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     serializer = CountrySerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -381,9 +352,8 @@ def search_countries(req):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def update_country(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     id = str(req.GET['id'])
     try:
         country = Country.objects.get(id=id)
@@ -433,40 +403,28 @@ def search_pilots(req):
 def get_pilot(req):
     id = str(req.GET['id'])
     try:
+        serializer2 = None
         pilot = Pilot.objects.get(id=id)
+        if not isinstance(req.user, AnonymousUser):
+            if pilot in Profile.objects.get(user=req.user).favourite_pilot.all():
+                is_fav = True
+            else:
+                is_fav = False
+            serializer2 = FavSerializer({'is_fav': is_fav})
         results = Result.objects.filter(pilot=pilot).order_by('-race__date')
     except Pilot.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = PilotSerializer(pilot)
     serializer1 = ResultSerializer(results, many=True)
-    return Response({'pilot': serializer.data, 'results': serializer1.data})
-
-
-##def pilots_get(req, _id):
-##    pilot = Pilot.objects.get(id=_id)
-##    faved = None
-##    if not isinstance(get_user(req), AnonymousUser):
-##        if pilot in Profile.objects.get(user=get_user(req)).favourite_pilot.all():
-##            faved = True
-##        else:
-##            faved = False
-##
-##    image = "/static/images/" + pilot.name + ".png"
-##    dislike_image = "/static/images/like_button.png"
-##    like_image = "/static/images/dislike_button.png"
-##
-##    results = Result.objects.filter(pilot=pilot).order_by('-race__date')
-##    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-##        -1] if req.user.is_authenticated else None,
-##           'header': 'Pilot Details', 'pilot': pilot, 'pilot_image': image, 'results': results, 'favourite': faved,
-##           'dislike_image': dislike_image, 'like_image': like_image}
-##    return render(req, 'pilot.html', ctx)
+    if serializer2:
+        return Response({'pilot': serializer.data, 'results': serializer1.data, 'is_fav': serializer2.data})
+    else:
+        return Response({'pilot': serializer.data, 'results': serializer1.data})
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def add_pilot(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     serializer = PilotSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -475,9 +433,8 @@ def add_pilot(req):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def update_pilot(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     id = str(req.GET['id'])
     try:
         pilot = Pilot.objects.get(id=id)
@@ -536,9 +493,8 @@ def get_race(req):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def new_race(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     serializer = RaceSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -547,9 +503,8 @@ def new_race(req):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def update_race(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     id = str(req.GET['id'])
     try:
         race = Race.objects.get(id=id)
@@ -613,9 +568,8 @@ def get_result(req):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def new_result(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     serializer = ResultSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -624,9 +578,8 @@ def new_result(req):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def update_result(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     id = str(req.GET['id'])
     try:
         result = Result.objects.get(id=id)
@@ -644,21 +597,25 @@ def update_result(req):
 
 @api_view(['GET'])
 def get_team(req):
-    #faved = None
-    #if not isinstance(get_user(req), AnonymousUser):
-    #    if team in Profile.objects.get(user=get_user(req)).favourite_team.all():
-    #        faved = True
-    #    else:
-    #        faved = False
     id = str(req.GET['id'])
+    serializer2 = None
     try:
         team = Team.objects.get(id=id)
+        if not isinstance(req.user, AnonymousUser):
+            if team in Profile.objects.get(user=req.user).favourite_team.all():
+                faved = True
+            else:
+                faved = False
+            serializer2 = FavSerializer({'is_fav': faved})
         pilots = Pilot.objects.filter(team=team)
     except Team.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = TeamSerializer(team)
     serializer1 = PilotSerializer(pilots, many=True)
-    return Response({'team': serializer.data, 'pilots': serializer1.data})
+    if serializer2:
+        return Response({'team': serializer.data, 'pilots': serializer1.data, 'fav': serializer2.data})
+    else:
+        return Response({'team': serializer.data, 'pilots': serializer1.data})
 
 
 @api_view(['GET'])
@@ -692,9 +649,8 @@ def get_teams(req):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def new_team(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     serializer = TeamSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -703,9 +659,8 @@ def new_team(req):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def update_team(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     id = str(req.GET['id'])
     try:
         team = Team.objects.get(id=id)
@@ -762,9 +717,8 @@ def get_teamleader(req):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def new_teamleader(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     serializer = TeamLeaderSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -772,9 +726,9 @@ def new_teamleader(req):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def update_teamleader(req):
-    #if not req.user.is_authenticated or req.user.username != 'admin':
-    #    return redirect('login')
     id = str(req.GET['id'])
     try:
         teamleader = TeamLeader.objects.get(id=id)

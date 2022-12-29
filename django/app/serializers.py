@@ -40,7 +40,9 @@ class TeamSerializer(serializers.ModelSerializer):
 class PilotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pilot
-        fields = ('name', 'date', 'victories', 'pole_positions', 'podiums', 'championships', 'contract', 'entry_year', 'team', 'country', 'image')
+        fields = (
+        'name', 'date', 'victories', 'pole_positions', 'podiums', 'championships', 'contract', 'entry_year', 'team',
+        'country', 'image')
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -77,3 +79,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('user', 'profile_image', 'biography', 'favourit_pilot', 'favourit_team')
+
+
+class FavSerializer(serializers.Serializer):
+    is_fav = serializers.BooleanField()

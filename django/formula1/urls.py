@@ -23,8 +23,6 @@ from app import views
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
-    # Home
-    path('', views.home, name='home'),
     # Auth
     path('ws/login', views.LoginAPI.as_view(), name='ws_login'),
     path('ws/logout', views.LogoutAPI.as_view(), name='ws_logout'),
