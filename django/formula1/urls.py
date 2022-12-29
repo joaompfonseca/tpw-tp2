@@ -26,9 +26,10 @@ urlpatterns = [
     # Home
     path('', views.home, name='home'),
     # Auth
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
-    path('signup/', views.signup, name='signup'),
+    path('ws/login', views.LoginAPI.as_view(), name='ws_login'),
+    path('ws/logout', views.LogoutAPI.as_view(), name='ws_logout'),
+    path('ws/signup', views.RegisterAPI.as_view(), name='ws_signup'),
+    path('ws/user', views.user_get, name='ws_user'),
     # Car
     path('ws/cars', views.get_cars, name='get_cars'),
     path('ws/car', views.get_car, name='get_car'),

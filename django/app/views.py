@@ -1,10 +1,12 @@
-from django.contrib.auth import authenticate, login, get_user
+from django.contrib.auth import authenticate, login, get_user, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework import status, authentication, permissions, views, generics
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from app.models import *
@@ -35,32 +37,73 @@ def home(req):
     return render(req, 'home.html', ctx)
 
 
-# Auth
-def signup(req):
-    if req.method == 'POST':
-        form = UserCreationForm(req.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            Profile.objects.create(user=user,
-                                   profile_image='/images/profiles/profile.jpg')
+class RegisterAPI(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
 
-            login(req, user)
-            return redirect('home')
-        else:
-            ctx = {
-                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-                    -1] if req.user.is_authenticated else None,
-                'form': form}
-            return render(req, 'signup.html', ctx)
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+        })
+
+
+class LoginAPI(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        temp = serializer.validated_data
+        user = authenticate(username=temp['username'], password=temp['password'])
+        login(request, user)
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+        })
+
+
+class LogoutAPI(generics.GenericAPIView):
+    def get(self, request, format=None):
+        logout(request)
+        return Response(status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def user_get(req):
+    user = req.user
+    print(user)
+    if user.is_authenticated:
+        return Response(status=status.HTTP_200_OK)
     else:
-        form = UserCreationForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'form': form}
-        return render(req, 'signup.html', ctx)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+# Auth
+#def signup(req):
+#    if req.method == 'POST':
+#        form = UserCreationForm(req.POST)
+#        if form.is_valid():
+#            form.save()
+#            username = form.cleaned_data.get('username')
+#            raw_password = form.cleaned_data.get('password1')
+#            user = authenticate(username=username, password=raw_password)
+#            Profile.objects.create(user=user,
+#                                   profile_image='/images/profiles/profile.jpg')
+#
+#            login(req, user)
+#            return redirect('home')
+#        else:
+#            ctx = {
+#                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
+#                    -1] if req.user.is_authenticated else None,
+#                'form': form}
+#            return render(req, 'signup.html', ctx)
+#    else:
+#        form = UserCreationForm()
+#        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
+#            -1] if req.user.is_authenticated else None,
+#               'form': form}
+#        return render(req, 'signup.html', ctx)
 
 
 # Profile
