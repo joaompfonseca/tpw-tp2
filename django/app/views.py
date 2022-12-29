@@ -161,92 +161,26 @@ def car_create(req):
 def car_search(req):
     model = str(req.GET['model'])
     pilot = str(req.GET['pilot'])
-    cars = Car.objects.filter(Q(model__icontains=model)
+    query = f'Car.model={model};Car.pilot={pilot}'
+    if 'searched' in req.session:
+        if query in req.session['searched'].keys():
+            pass
+        else:
+            cars = Car.objects.filter(Q(model__icontains=model)
                                       & Q(pilot__name__icontains=pilot))
-    #print(cars1)
-    #query = f'Car.model={model};Car.pilot={pilot}'
-    #if 'searched' in req.session:
-    #    print("here")
-    #    if query in req.session['searched'].keys():
-    #        print("here2")
-    #        cars = req.session['searched'][query]
-    #    else:
-    #        print("here3")
-    #        cars = Car.objects.filter(Q(model__icontains=model)
-    #                                  & Q(pilot__name__icontains=pilot))
-    #        if len(req.session['searched']) >= 10:
-    #            (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-    #        print("before")
-    #        req.session['searched'][query] = cars
-    #        req.session.save()
-    #        print("after")
-    #else:
-    #    print("there")
-    #    model = str(req.GET['model'])
-    #    pilot = str(req.GET['pilot'])
-    #    req.session['searched'] = dict()
-    #    # make query
-    #    cars = Car.objects.filter(Q(model__icontains=model)
-    #                              & Q(pilot__name__icontains=pilot))
-    #    req.session['searched'][query] = cars
-    #print(cars)
-    serializer = CarSerializer(cars, many=True)
-    return Response(serializer.data)
-
-
-def cars_search(req):
-    if req.method == 'POST':
-        form = CarSearchForm(req.POST)
-        if form.is_valid():
-            model = form.cleaned_data['model']
-            pilot = form.cleaned_data['pilot']
-
-            query = f'Car.model={model};Car.pilot={pilot}'
-            if 'searched' in req.session:
-                # print('I entered searched.')
-                if query in req.session['searched'].keys():
-                    lst = req.session['searched'][query]
-                    # print("I entered cache")
-                    # print(req.session['searched'].keys())
-                else:
-                    # print("I entered query")
-                    model = form.cleaned_data['model']
-                    pilot = form.cleaned_data['pilot']
-                    cars = Car.objects.filter(Q(model__icontains=model)
-                                              & Q(pilot__name__icontains=pilot))
-                    lst = [[{'str': c.model, 'url': f'/cars/{c.id}'}] for c in cars]
-
-                    # print(len(req.session['searched'].keys()))
-                    if len(req.session['searched'].keys()) >= 10:
-                        # print("I entered removed")
-                        # removes first added element to cache
-                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-
-                    req.session['searched'][query] = lst
-                    req.session.save()
-                    # print("Just added and saved session")
-            else:
-                # print("I entered have to initialize searched")
-                req.session['searched'] = dict()
-                # make query
-                model = form.cleaned_data['model']
-                pilot = form.cleaned_data['pilot']
-                cars = Car.objects.filter(Q(model__icontains=model)
-                                          & Q(pilot__name__icontains=pilot))
-                lst = [[{'str': c.model, 'url': f'/cars/{c.id}'}] for c in cars]
-                req.session['searched'][query] = lst
-            ctx = {
-                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-                    -1] if req.user.is_authenticated else None,
-                'header': 'List of Cars', 'list': lst, 'query': f'Model {model}; Pilot {pilot}'}
-            return render(req, 'list.html', ctx)
+            if len(req.session['searched']) >= 10:
+                (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+            serializer = CarSerializer(cars, many=True)
+            req.session['searched'][query] = serializer.data
+            req.session.save()
     else:
-        form = CarSearchForm()
-        cars = Car.objects.all()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Search Car', 'form': form, 'options': cars, 'id_field': 'id_model', 'id_field2': 'id_pilot'}
-        return render(req, 'search.html', ctx)
+        req.session['searched'] = dict()
+        # make query
+        cars = Car.objects.filter(Q(model__icontains=model)
+                                  & Q(pilot__name__icontains=pilot))
+        serializer = CarSerializer(cars, many=True)
+        req.session['searched'][query] = serializer.data
+    return Response(req.session['searched'][query])
 
 
 @api_view(['GET'])
@@ -287,62 +221,24 @@ def get_circuits(req):
 @api_view(['GET'])
 def search_circuits(req):
     name = str(req.GET['name'])
-    circuits = Circuit.objects.filter(name__icontains=name)
-    serializer = CircuitSerializer(circuits, many=True)
-    return Response(serializer.data)
-
-
-def circuits_search(req):
-    # If POST request, process form data
-    if req.method == 'POST':
-        # Create a form instance and pass data to it
-        form = CircuitSearchForm(req.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-
-            query = f'Circuit.name={name}'
-            if 'searched' in req.session:
-                # print('I entered searched.')
-                if query in req.session['searched'].keys():
-                    lst = req.session['searched'][query]
-                    # print("I entered cache")
-                    # print(req.session['searched'].keys())
-                else:
-                    # print("I entered query")
-                    circuits = Circuit.objects.filter(name__icontains=name)
-                    lst = [[{'str': p.name, 'url': f'/circuits/{p.id}'}]
-                           for p in circuits]
-                    # print(len(req.session['searched'].keys()))
-                    if len(req.session['searched'].keys()) >= 10:
-                        # print("I entered removed")
-                        # removes first added element to cache
-                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-
-                    req.session['searched'][query] = lst
-                    req.session.save()
-                    # print("Just added and saved session")
-            else:
-                # print("I entered have to initialize searched")
-                req.session['searched'] = dict()
-                # make query
-                circuits = Circuit.objects.filter(name__icontains=name)
-                lst = [[{'str': p.name, 'url': f'/circuits/{p.id}'}]
-                       for p in circuits]
-                req.session['searched'][query] = lst
-
-            ctx = {
-                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-                    -1] if req.user.is_authenticated else None,
-                'header': 'List of Circuits', 'list': lst, 'query': name}
-            return render(req, 'list.html', ctx)
+    query = f'Circuit.name={name}'
+    if 'searched' in req.session:
+        if query in req.session['searched'].keys():
+            pass
+        else:
+            circuits = Circuit.objects.filter(name__icontains=name)
+            if len(req.session['searched']) >= 10:
+                (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+            serializer = CircuitSerializer(circuits, many=True)
+            req.session['searched'][query] = serializer.data
+            req.session.save()
     else:
-        # If GET (or any other method), create blank form
-        form = CircuitSearchForm()
-        circuits = Circuit.objects.all()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Search Circuit', 'form': form, 'options': circuits, 'id_field': 'id_name'}
-        return render(req, 'search.html', ctx)
+        req.session['searched'] = dict()
+        # make query
+        circuits = Circuit.objects.filter(name__icontains=name)
+        serializer = CircuitSerializer(circuits, many=True)
+        req.session['searched'][query] = serializer.data
+    return Response(req.session['searched'][query])
 
 
 @api_view(['GET'])
@@ -420,62 +316,25 @@ def new_country(req):
 
 @api_view(['GET'])
 def search_countries(req):
-    name = str(req.GET['name'])
-    countries = Country.objects.filter(designation__icontains=name)
-    serializer = CountrySerializer(countries, many=True)
-    return Response(serializer.data)
-
-
-def countries_search(req):
-    if req.method == 'POST':
-        form = CountrySearchForm(req.POST)
-        if form.is_valid():
-            designation = form.cleaned_data['designation']
-
-            query = f'Country.designation={designation}'
-            if 'searched' in req.session:
-                # print('I entered searched.')
-                if query in req.session['searched'].keys():
-                    lst = req.session['searched'][query]
-                    # print("I entered cache")
-                    # print(req.session['searched'].keys())
-                else:
-                    # print("I entered query")
-                    countries = Country.objects.filter(designation__icontains=designation)
-
-                    lst = [[{'str': c.designation, 'url': f'/countries/{c.id}'}]
-                           for c in countries]
-                    # print(len(req.session['searched'].keys()))
-                    if len(req.session['searched'].keys()) >= 10:
-                        # print("I entered removed")
-                        # removes first added element to cache
-                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-
-                    req.session['searched'][query] = lst
-                    req.session.save()
-                    # print("Just added and saved session")
-            else:
-                # print("I entered have to initialize searched")
-                req.session['searched'] = dict()
-                # make query
-                countries = Country.objects.filter(designation__icontains=designation)
-
-                lst = [[{'str': c.designation, 'url': f'/countries/{c.id}'}]
-                       for c in countries]
-                req.session['searched'][query] = lst
-
-            ctx = {
-                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-                    -1] if req.user.is_authenticated else None,
-                'header': 'Countries', 'list': lst, 'query': designation}
-            return render(req, 'list.html', ctx)
+    designation = str(req.GET['designation'])
+    query = f'Country.designation={designation}'
+    if 'searched' in req.session:
+        if query in req.session['searched'].keys():
+            pass
+        else:
+            countries = Country.objects.filter(designation__icontains=designation)
+            if len(req.session['searched']) >= 10:
+                (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+            serializer = CountrySerializer(countries, many=True)
+            req.session['searched'][query] = serializer.data
+            req.session.save()
     else:
-        form = CountrySearchForm()
-        countries = Country.objects.all()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Search Country', 'form': form, 'options': countries, 'id_field': 'id_designation'}
-        return render(req, 'search.html', ctx)
+        req.session['searched'] = dict()
+        # make query
+        countries = Country.objects.filter(designation__icontains=designation)
+        serializer = CountrySerializer(countries, many=True)
+        req.session['searched'][query] = serializer.data
+    return Response(req.session['searched'][query])
 
 
 @api_view(['PUT'])
@@ -507,61 +366,24 @@ def get_pilots(req):
 @api_view(['GET'])
 def search_pilots(req):
     name = str(req.GET['name'])
-    pilots = Pilot.objects.filter(name__icontains=name)
-    serializer = PilotSerializer(pilots, many=True)
-    return Response(serializer.data)
-
-
-def pilots_search(req):
-    # If POST request, process form data
-    if req.method == 'POST':
-        # Create a form instance and pass data to it
-        form = PilotSearchForm(req.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            query = f'Pilot.name={name}'
-            if 'searched' in req.session:
-                # print('I entered searched.')
-                if query in req.session['searched'].keys():
-                    lst = req.session['searched'][query]
-                    # print("I entered cache")
-                    # print(req.session['searched'].keys())
-                else:
-                    # print("I entered query")
-                    pilots = Pilot.objects.filter(name__icontains=name)
-                    lst = [[{'str': p.name, 'url': f'/pilots/{p.id}'}]
-                           for p in pilots]
-                    # print(len(req.session['searched'].keys()))
-                    if len(req.session['searched'].keys()) >= 10:
-                        # print("I entered removed")
-                        # removes first added element to cache
-                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-
-                    req.session['searched'][query] = lst
-                    req.session.save()
-                    # print("Just added and saved session")
-            else:
-                # print("I entered have to initialize searched")
-                req.session['searched'] = dict()
-                # make query
-                pilots = Pilot.objects.filter(name__icontains=name)
-                lst = [[{'str': p.name, 'url': f'/pilots/{p.id}'}]
-                       for p in pilots]
-                req.session['searched'][query] = lst
-
-            ctx = {
-                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-                    -1] if req.user.is_authenticated else None,
-                'header': 'List of Pilots', 'list': lst, 'query': name}
-            return render(req, 'list.html', ctx)
+    query = f'Pilot.name={name}'
+    if 'searched' in req.session:
+        if query in req.session['searched'].keys():
+            pass
+        else:
+            pilots = Pilot.objects.filter(name__icontains=name)
+            if len(req.session['searched']) >= 10:
+                (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+            serializer = PilotSerializer(pilots, many=True)
+            req.session['searched'][query] = serializer.data
+            req.session.save()
     else:
-        # If GET (or any other method), create blank form
-        pilots = Pilot.objects.all()
-        form = PilotSearchForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Search Pilot', 'form': form, 'options': pilots, 'id_field': "id_name"}
-        return render(req, 'search.html', ctx)
+        req.session['searched'] = dict()
+        # make query
+        pilots = Pilot.objects.filter(nameicontains=name)
+        serializer = PilotSerializer(pilots, many=True)
+        req.session['searched'][query] = serializer.data
+    return Response(req.session['searched'][query])
 
 
 @api_view(['GET'])
@@ -637,62 +459,24 @@ def get_races(req):
 @api_view(['GET'])
 def search_races(req):
     name = str(req.GET['name'])
-    races = Race.objects.filter(name__icontains=name)
-    serializer = RaceSerializer(races, many=True)
-    return Response(serializer.data)
-
-
-def races_search(req):
-    # If POST request, process form data
-    if req.method == 'POST':
-        # Create a form instance and pass data to it
-        form = RaceSearchForm(req.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-
-            query = f'Race.name={name}'
-            if 'searched' in req.session:
-                # print('I entered searched.')
-                if query in req.session['searched'].keys():
-                    lst = req.session['searched'][query]
-                    # print("I entered cache")
-                    # print(req.session['searched'].keys())
-                else:
-                    # print("I entered query")
-                    races = Race.objects.filter(name__icontains=name)
-                    lst = [[{'str': r.name, 'url': f'/races/{r.id}'}]
-                           for r in races]
-                    # print(len(req.session['searched'].keys()))
-                    if len(req.session['searched'].keys()) >= 10:
-                        # print("I entered removed")
-                        # removes first added element to cache
-                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-
-                    req.session['searched'][query] = lst
-                    req.session.save()
-                    # print("Just added and saved session")
-            else:
-                # print("I entered have to initialize searched")
-                req.session['searched'] = dict()
-                # make query
-                races = Race.objects.filter(name__icontains=name)
-                lst = [[{'str': r.name, 'url': f'/races/{r.id}'}]
-                       for r in races]
-                req.session['searched'][query] = lst
-
-            ctx = {
-                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-                    -1] if req.user.is_authenticated else None,
-                'header': 'List of Races', 'list': lst, 'query': name}
-            return render(req, 'list.html', ctx)
+    query = f'Race.name={name}'
+    if 'searched' in req.session:
+        if query in req.session['searched'].keys():
+            pass
+        else:
+            races = Race.objects.filter(name__icontains=name)
+            if len(req.session['searched']) >= 10:
+                (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+            serializer = RaceSerializer(races, many=True)
+            req.session['searched'][query] = serializer.data
+            req.session.save()
     else:
-        # If GET (or any other method), create blank form
-        form = RaceSearchForm()
-        races = Race.objects.all()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-            -1] if req.user.is_authenticated else None,
-               'header': 'Search Race', 'form': form, 'options': races, 'id_field': "id_name"}
-        return render(req, 'search.html', ctx)
+        req.session['searched'] = dict()
+        # make query
+        races = Race.objects.filter(name__icontains=name)
+        serializer = RaceSerializer(races, many=True)
+        req.session['searched'][query] = serializer.data
+    return Response(req.session['searched'][query])
 
 
 @api_view(['GET'])
@@ -837,66 +621,24 @@ def get_team(req):
 @api_view(['GET'])
 def search_team(req):
     name = str(req.GET['name'])
-    try:
-        team = Team.objects.filter(name__icontains=name)
-    except Team.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    serializer = TeamSerializer(team, many=True)
-    return Response(serializer.data)
-
-
-#def teams_search(req):
-#    # If POST request, process form data
-#    if req.method == 'POST':
-#        # Create a form instance and pass data to it
-#        form = TeamSearchForm(req.POST)
-#        if form.is_valid():
-#            name = form.cleaned_data['name']
-#
-#            query = f'Team.name={name}'
-#
-#            if 'searched' in req.session:
-#                # print('I entered searched.')
-#                if query in req.session['searched'].keys():
-#                    lst = req.session['searched'][query]
-#                    # print("I entered cache")
-#                    # print(req.session['searched'].keys())
-#                else:
-#                    # print("I entered query")
-#                    teams = Team.objects.filter(name__icontains=name)
-#                    lst = [[{'str': t.name, 'url': f'/teams/{t.id}'}]
-#                           for t in teams]
-#                    # print(len(req.session['searched'].keys()))
-#                    if len(req.session['searched'].keys()) >= 10:
-#                        # print("I entered removed")
-#                        # removes first added element to cache
-#                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-#
-#                    req.session['searched'][query] = lst
-#                    req.session.save()
-#                    # print("Just added and saved session")
-#            else:
-#                # print("I entered have to initialize searched")
-#                req.session['searched'] = dict()
-#                # make query
-#                teams = Team.objects.filter(name__icontains=name)
-#                lst = [[{'str': t.name, 'url': f'/teams/{t.id}'}]
-#                       for t in teams]
-#                req.session['searched'][query] = lst
-#
-#            ctx = {
-#                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-#                    -1] if req.user.is_authenticated else None,
-#                'header': 'List of Teams', 'list': lst, 'query': name}
-#            return render(req, 'list.html', ctx)
-#    else:
-#        # If GET (or any other method), create blank form
-#        form = TeamSearchForm()
-#        teams = Team.objects.all()
-#        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-#            -1] if req.user.is_authenticated else None,
-#               'header': 'Search Team', 'form': form, 'options': teams, 'id_field': "id_name"}
-#        return render(req, 'search.html', ctx)
+    query = f'Team.name={name}'
+    if 'searched' in req.session:
+        if query in req.session['searched'].keys():
+            pass
+        else:
+            teams = Team.objects.filter(name__icontains=name)
+            if len(req.session['searched']) >= 10:
+                (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+            serializer = TeamSerializer(teams, many=True)
+            req.session['searched'][query] = serializer.data
+            req.session.save()
+    else:
+        req.session['searched'] = dict()
+        # make query
+        teams = Team.objects.filter(name__icontains=name)
+        serializer = TeamSerializer(teams, many=True)
+        req.session['searched'][query] = serializer.data
+    return Response(req.session['searched'][query])
 
 
 @api_view(['GET'])
@@ -945,66 +687,24 @@ def get_teamleaders(req):
 @api_view(['GET'])
 def search_teamleader(req):
     name = str(req.GET['name'])
-    try:
-        teamleader = TeamLeader.objects.filter(name__icontains=name)
-    except TeamLeader.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    serializer = TeamLeaderSerializer(teamleader, many=True)
-    return Response(serializer.data)
-
-
-#def teamleaders_search(req):
-#    # If POST request, process form data
-#    if req.method == 'POST':
-#        # Create a form instance and pass data to it
-#        form = TeamLeaderSearchForm(req.POST)
-#        if form.is_valid():
-#            name = form.cleaned_data['name']
-#
-#            query = f'TeamLeader.name={name}'
-#            if 'searched' in req.session:
-#                # print('I entered searched.')
-#                if query in req.session['searched'].keys():
-#                    lst = req.session['searched'][query]
-#                    # print("I entered cache")
-#                    # print(req.session['searched'].keys())
-#                else:
-#                    # print("I entered query")
-#                    teamleaders = TeamLeader.objects.filter(name__icontains=name)
-#
-#                    lst = [[{'str': tl.name, 'url': f'/teamleaders/{tl.id}'}]
-#                           for tl in teamleaders]
-#                    # print(len(req.session['searched'].keys()))
-#                    if len(req.session['searched'].keys()) >= 10:
-#                        # print("I entered removed")
-#                        # removes first added element to cache
-#                        (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
-#
-#                    req.session['searched'][query] = lst
-#                    req.session.save()
-#                    # print("Just added and saved session")
-#            else:
-#                print("I entered have to initialize searched")
-#                req.session['searched'] = dict()
-#                # make query
-#                teamleaders = TeamLeader.objects.filter(name__icontains=name)
-#
-#                lst = [[{'str': tl.name, 'url': f'/teamleaders/{tl.id}'}]
-#                       for tl in teamleaders]
-#                req.session['searched'][query] = lst
-#            ctx = {
-#                'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-#                    -1] if req.user.is_authenticated else None,
-#                'header': 'List of Team Leaders', 'list': lst, 'query': name}
-#            return render(req, 'list.html', ctx)
-#    else:
-#        # If GET (or any other method), create blank form
-#        form = TeamLeaderSearchForm()
-#        teamleadres = TeamLeader.objects.all()
-#        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-#            -1] if req.user.is_authenticated else None,
-#               'header': 'Search Team Leader', 'form': form, 'options': teamleadres, 'id_field': "id_name"}
-#        return render(req, 'search.html', ctx)
+    query = f'TeamLeader.name={name}'
+    if 'searched' in req.session:
+        if query in req.session['searched'].keys():
+            pass
+        else:
+            teamleaders = TeamLeader.objects.filter(name__icontains=name)
+            if len(req.session['searched']) >= 10:
+                (k := next(iter(req.session['searched'])), req.session['searched'].pop(k))
+            serializer = TeamLeaderSerializer(teamleaders, many=True)
+            req.session['searched'][query] = serializer.data
+            req.session.save()
+    else:
+        req.session['searched'] = dict()
+        # make query
+        teamleaders = TeamLeader.objects.filter(name__icontains=name)
+        serializer = TeamLeaderSerializer(teamleaders, many=True)
+        req.session['searched'][query] = serializer.data
+    return Response(req.session['searched'][query])
 
 
 @api_view(['GET'])
