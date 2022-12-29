@@ -3,5 +3,6 @@ import {Team} from "./team";
 export interface TeamLeader {
   id: number
   name: string
-  team: Team
+  team?: Team
+  image: string
 }

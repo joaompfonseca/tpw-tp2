@@ -7,7 +7,6 @@ import { CircuitComponent } from './circuit/circuit.component';
 import { CountryComponent } from './country/country.component';
 import { EditComponent } from './edit/edit.component';
 import { HomeComponent } from './home/home.component';
-import { LayoutComponent } from './layout/layout.component';
 import { ListComponent } from './list/list.component';
 import { LoginComponent } from './login/login.component';
 import { LoginpartialComponent } from './loginpartial/loginpartial.component';
@@ -30,7 +29,6 @@ import { AppRoutingModule } from './app-routing.module';
     CountryComponent,
     EditComponent,
     HomeComponent,
-    LayoutComponent,
     ListComponent,
     LoginComponent,
     LoginpartialComponent,

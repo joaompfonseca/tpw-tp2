@@ -8,6 +8,8 @@
   </p>
 </ng-container>
 
-<img [src]="teamleader_image" alt="TeamLeader Image" style="width: auto; height: auto">
+<img [src]="teamleader.image" alt="TeamLeader Image" style="width: auto; height: auto">
 <p><b>Name: </b>{{ teamleader.name }}</p>
-<p><b>Team: </b><a routerLink="/teams/{{teamleader.team.id}}">{{ teamleader.team.name }}</a></p>
+<ng-container *ngIf="teamleader.team">
+  <p><b>Team: </b><a routerLink="/teams/{{teamleader.team.id}}">{{ teamleader.team.name }}</a></p>
+</ng-container>
