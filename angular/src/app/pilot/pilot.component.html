@@ -1,0 +1,66 @@
+<div class="row">
+  <h2>{{ header }}</h2>
+  <div *ngIf="user.is_authenticated">
+    <a *ngIf="isFavourite" (click)="removeFromFavourites()">
+      <img [src]="likeImage" alt="Like Image" style="width: 25px; height: 23px; margin-top: 9px; margin-left: 10px">
+    </a>
+    <a *ngIf="!isFavourite" (click)="addToFavourites()">
+      <img [src]="dislikeImage" alt="Dislike Image"
+           style="width: 25px; height: 22px; margin-top: 9px; margin-left: 10px">
+    </a>
+  </div>
+</div>
+<br>
+
+<div *ngIf="user.is_authenticated && user.is_superuser">
+  <p>
+    <strong>Actions: </strong>
+    <a routerLink="/pilots/{{pilot.id}}/edit">Edit Pilot</a>
+    -
+    <a routerLink="/results/new">New Result</a>
+  </p>
+</div>
+<div class="row">
+  <div class="col-lg-6 col-md-6 col-sm-12" style="padding-bottom: 30px">
+    <img [src]="pilot.image" alt="Pilot Image" style="width: 206px; height: 206px">
+    <p style="padding-top: 10px"><b>Name: </b> {{ pilot.name }}</p>
+    <p><b>Birth Date: </b> {{ pilot.date }}</p>
+    <p><b>Victories: </b> {{ pilot.victories }}</p>
+    <p><b>Pole Positions: </b> {{ pilot.pole_positions }}</p>
+    <p><b>Championships: </b> {{ pilot.championships }}</p>
+    <p><b>Contract: </b> {{ pilot.contract }}</p>
+    <p><b>Entry Year: </b> {{ pilot.entry_year }}</p>
+    <p><b>Team: </b> <a routerLink="/teams/{{pilot.team.id}}">{{ pilot.team.name }}</a></p>
+    <p><b>Country(ies): </b>
+      <ng-container *ngFor="let c of pilot.country; let last = last">
+        <a routerLink="/countries/{{c.id}}">{{ c.designation }} ({{ c.code }})</a>
+        <span *ngIf="!last">,</span>
+      </ng-container>
+    </p>
+  </div>
+  <div class="col-lg-6 col-md-6 col-sm-12" *ngIf="results.length > 0">
+    <h4 style="padding-bottom: 20px">Pilot's Results</h4>
+    <table style="border-collapse: separate; border-spacing: 1em; color: white">
+      <tr>
+        <th>Position</th>
+        <th>Race</th>
+        <th>Points</th>
+        <th *ngIf="user.is_authenticated && user.is_superuser">Actions</th>
+      </tr>
+      <tr *ngFor="let r of results">
+        <td>{{ r.position }}</td>
+        <td><a routerLink="/races/{{r.race.id}}">{{ r.race.name }}</a></td>
+        <td>{{ r.points }}</td>
+        <td *ngIf="user.is_authenticated && user.is_superuser">
+          <a routerLink="/results/{{r.id}}/edit">Edit</a>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><b>Total Points:</b></td>
+        <td><b>{{ pilot.points }}</b></td>
+        <td *ngIf="user.is_authenticated && user.is_superuser"></td>
+      </tr>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<h2>{{ header }}</h2>
+<br>
+
+<ng-container *ngIf="user.is_authenticated && user.is_superuser">
+  <p>
+    <strong>Actions: </strong>
+    <a routerLink="/countries/{{country.id}}/edit">Edit Country</a>
+  </p>
+</ng-container>
+
+<p><b>Designation: </b>{{ country.designation }}</p>
+<p><b>Code: </b>{{ country.code }}</p>
+
+<ng-container *ngIf="circuits.length > 0">
+  <p><b>Circuits: </b>
+    <ng-container *ngFor="let c of circuits; let last=last">
+      <a routerLink="/circuits/{{c.id}}">{{ c.name }}</a>
+      <ng-container *ngIf="!last"> -</ng-container>
+    </ng-container>
+  </p>
+</ng-container>
+
+<ng-container *ngIf="pilots.length > 0">
+  <p><b>Pilots: </b>
+    <ng-container *ngFor="let p of pilots; let last=last">
+      <a routerLink="/pilots/{{p.id}}">{{ p.name }}</a>
+      <ng-container *ngIf="!last"> -</ng-container>
+    </ng-container>
+  </p>
+</ng-container>

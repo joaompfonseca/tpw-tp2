@@ -1,0 +1,33 @@
+<!--
+<h2>Sign up</h2>
+<br>
+
+<div class="gaming-library">
+  <div class="col-lg-12">
+    <form (ngSubmit)="onSubmit()" #form="ngForm" method="post" enctype="multipart/form-data">
+      <table style="border-collapse: separate; border-spacing: 1em; color: white">
+        <tr>
+          <th>{{ form.username.label_tag }}</th>
+          <td>{{ form.username }}</td>
+        </tr>
+        <tr>
+          <th>{{ form.password1.label_tag }}</th>
+          <td>{{ form.password1 }}</td>
+        </tr>
+        <tr>
+          <th>{{ form.password2.label_tag }}</th>
+          <td>{{ form.password2 }}</td>
+        </tr>
+      </table>
+      <button type="submit" class="btn btn-primary">Sign up</button>
+    </form>
+    <ng-container *ngIf="form.errors.length > 0">
+      <div class="validation-summary-errors" style="color: #a80000">
+        <div *ngFor="let error of form.errors">
+          {{ error }}<br>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+-->
