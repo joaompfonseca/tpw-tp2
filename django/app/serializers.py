@@ -28,39 +28,39 @@ class RegisterSerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields = ('designation', 'code')
+        fields = ('id', 'designation', 'code')
 
 
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ('name', 'date', 'championships', 'image')
+        fields = ('id', 'name', 'date', 'championships', 'image')
 
 
 class PilotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pilot
         fields = (
-        'name', 'date', 'victories', 'pole_positions', 'podiums', 'championships', 'contract', 'entry_year', 'team',
-        'country', 'image')
+            'id', 'name', 'date', 'victories', 'pole_positions', 'podiums', 'championships', 'contract', 'entry_year', 'team',
+            'country', 'image')
 
 
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
-        fields = ('model', 'engine', 'weight', 'pilot')
+        fields = ('id', 'model', 'engine', 'weight', 'pilot')
 
 
 class CircuitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Circuit
-        fields = ('name', 'length', 'location', 'last_winner', 'country')
+        fields = ('id', 'name', 'length', 'location', 'last_winner', 'country')
 
 
 class RaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Race
-        fields = ('name', 'date', 'season', 'fast_lap', 'circuit')
+        fields = ('id', 'name', 'date', 'season', 'fast_lap', 'circuit')
 
 
 class ResultSerializer(serializers.ModelSerializer):
@@ -72,7 +72,7 @@ class ResultSerializer(serializers.ModelSerializer):
 class TeamLeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeamLeader
-        fields = ('name', 'team', 'image')
+        fields = ('id', 'name', 'team', 'image')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -83,3 +83,15 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class FavSerializer(serializers.Serializer):
     is_fav = serializers.BooleanField()
+
+
+class HeaderSerializer(serializers.Serializer):
+    header = serializers.CharField()
+
+
+class AuthSerializer(serializers.Serializer):
+    is_authenticated = serializers.BooleanField()
+    is_superuser = serializers.BooleanField()
+
+class PointsSerializer(serializers.Serializer):
+    points = serializers.IntegerField()

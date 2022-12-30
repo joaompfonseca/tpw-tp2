@@ -92,10 +92,18 @@ def car_get(req):
     _id = int(req.GET['id'])
     try:
         car = Car.objects.get(id=_id)
+        pilot = Pilot.objects.get(car=car)
+        pa = PilotSerializer(pilot)
+        team = pilot.team
+        ta = TeamSerializer(team)
+        header = HeaderSerializer({'header': 'Car Details'})
+        is_authenticated = IsAuthenticated()
+        is_superuser = IsAdminUser()
+        auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
     except Car.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CarSerializer(car)
-    return Response(serializer.data)
+    return Response({'car': serializer.data, 'pilot': pa.data, 'team': ta.data, 'header': header.data, 'auth': auth.data})
 
 
 @api_view(['GET'])
@@ -164,11 +172,19 @@ def circuit_get(req):
     try:
         circuit = Circuit.objects.get(id=_id)
         races = Race.objects.filter(circuit=circuit)
+        is_authenticated = IsAuthenticated()
+        is_superuser = IsAdminUser()
+        country = circuit.country
+        last_winner = circuit.last_winner
     except Circuit.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CircuitSerializer(circuit)
     serializer1 = RaceSerializer(races, many=True)
-    return Response({'circuit': serializer.data, 'races': serializer1.data})
+    auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
+    header = HeaderSerializer({'header': 'Circuit Details'})
+    country = CountrySerializer(country)
+    pilot = PilotSerializer(last_winner)
+    return Response({'circuit': serializer.data, 'races': serializer1.data, 'country': country.data, 'last_winner': pilot.data, 'auth': auth.data, 'header': header.data})
 
 
 @api_view(['GET'])
@@ -234,11 +250,17 @@ def country_get(req):
     try:
         country = Country.objects.get(id=_id)
         pilots = Pilot.objects.filter(country=country)
+        circuits = Circuit.objects.filter(country=country)
+        is_authenticated = IsAuthenticated()
+        is_superuser = IsAdminUser()
     except Country.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CountrySerializer(country)
     serializer1 = PilotSerializer(pilots, many=True)
-    return Response({'country': serializer.data, 'pilots': serializer1.data})
+    circuits = CircuitSerializer(circuits, many=True)
+    header = HeaderSerializer({'header': 'Country Details'})
+    auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
+    return Response({'country': serializer.data, 'pilots': serializer1.data, 'circuits': circuits.data, 'auth': auth.data, 'header': header.data})
 
 
 @api_view(['GET'])
@@ -311,14 +333,42 @@ def pilot_get(req):
                 is_fav = False
             serializer2 = FavSerializer({'is_fav': is_fav})
         results = Result.objects.filter(pilot=pilot).order_by('-race__date')
+        team = pilot.team
+        is_authenticated = IsAuthenticated()
+        is_superuser = IsAdminUser()
+        countries = pilot.country
+        races = []
+        for result in results:
+            races.append(result.race)
+
     except Pilot.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    points = 0
+    for result in results:
+        points += result.points
+
     serializer = PilotSerializer(pilot)
     serializer1 = ResultSerializer(results, many=True)
+    serializer3 = TeamSerializer(team)
+    serializer4 = CountrySerializer(countries, many=True)
+    serializer5 = RaceSerializer(races, many=True)
+    header = HeaderSerializer({'header': 'Pilot Details'})
+    auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
+    points = PointsSerializer({'points': points})
     if serializer2:
-        return Response({'pilot': serializer.data, 'results': serializer1.data, 'is_fav': serializer2.data})
+        return Response({'pilot': serializer.data, 'results': serializer1.data, 'is_fav': serializer2.data, 'header': header.data, 'auth': auth.data, 'team': serializer3.data, 'country': serializer4.data, 'points': points.data, 'races': serializer5.data})
     else:
-        return Response({'pilot': serializer.data, 'results': serializer1.data})
+        return Response({'pilot': serializer.data, 'results': serializer1.data, 'header': header.data, 'auth': auth.data, 'team': serializer3.data, 'country': serializer4.data, 'points': points.data, 'races': serializer5.data})
+
+
+def pilot_points(id):
+    pilot = Pilot.objects.get(id=id)
+    results = Result.objects.filter(pilot=pilot)
+    points = 0
+    for result in results:
+        points += result.points
+    return points
 
 
 @api_view(['GET'])
@@ -384,11 +434,21 @@ def race_get(req):
     try:
         race = Race.objects.get(id=_id)
         results = Result.objects.filter(race=race).order_by('position')
+        is_authenticated = IsAuthenticated()
+        is_superuser = IsAdminUser()
+        circuit = race.circuit
+        pilots = []
+        for result in results:
+            pilots.append(result.pilot)
     except Race.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = RaceSerializer(race)
     serializer1 = ResultSerializer(results, many=True)
-    return Response({'race': serializer.data, 'results': serializer1.data})
+    serializer2 = CircuitSerializer(circuit)
+    serializer3 = PilotSerializer(pilots, many=True)
+    header = HeaderSerializer({'header': 'Race Details'})
+    auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
+    return Response({'race': serializer.data, 'results': serializer1.data, 'header': header.data, 'auth': auth.data, 'circuit': serializer2.data, 'pilots': serializer3.data})
 
 
 @api_view(['GET'])
@@ -499,14 +559,27 @@ def team_get(req):
                 faved = False
             serializer2 = FavSerializer({'is_fav': faved})
         pilots = Pilot.objects.filter(team=team)
+        is_authenticated = IsAuthenticated()
+        is_superuser = IsAdminUser()
+        teamleader = team.teamleader
+
+        points = 0
+        for pilot in pilots:
+            points += pilot_points(pilot.id)
+
+
     except Team.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = TeamSerializer(team)
     serializer1 = PilotSerializer(pilots, many=True)
+    serializer3 = TeamLeaderSerializer(teamleader)
+    points = PointsSerializer({'points': points})
+    header = HeaderSerializer({'header': 'Team Details'})
+    auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
     if serializer2:
-        return Response({'team': serializer.data, 'pilots': serializer1.data, 'fav': serializer2.data})
+        return Response({'team': serializer.data, 'pilots': serializer1.data, 'fav': serializer2.data, 'header': header.data, 'auth': auth.data, 'teamleader': serializer3.data, 'points': points.data})
     else:
-        return Response({'team': serializer.data, 'pilots': serializer1.data})
+        return Response({'team': serializer.data, 'pilots': serializer1.data, 'header': header.data, 'auth': auth.data, 'teamleader': serializer3.data, 'points': points.data})
 
 
 @api_view(['GET'])
@@ -571,10 +644,16 @@ def teamleader_get(req):
     _id = int(req.GET['id'])
     try:
         teamleader = TeamLeader.objects.get(id=_id)
+        is_authenticated = IsAuthenticated()
+        is_superuser = IsAdminUser()
+        team = teamleader.team
     except TeamLeader.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = TeamLeaderSerializer(teamleader)
-    return Response(serializer.data)
+    serializer1 = TeamSerializer(team)
+    header = HeaderSerializer({'header': 'Team Leader Details'})
+    auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
+    return Response({'teamleader': serializer.data, 'team': serializer1.data, 'header': header.data, 'auth': auth.data})
 
 
 @api_view(['GET'])
