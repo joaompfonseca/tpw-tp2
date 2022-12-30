@@ -15,7 +15,6 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from app import views
@@ -24,77 +23,65 @@ urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
     # Auth
-    path('ws/login', views.LoginAPI.as_view(), name='ws_login'),
-    path('ws/logout', views.LogoutAPI.as_view(), name='ws_logout'),
-    path('ws/signup', views.RegisterAPI.as_view(), name='ws_signup'),
-    path('ws/user', views.user_get, name='ws_user'),
+    path('ws/login', views.LoginAPI.as_view()),
+    path('ws/logout', views.LogoutAPI.as_view()),
+    path('ws/signup', views.RegisterAPI.as_view()),
+    path('ws/user', views.user_get),
     # Car
-    path('ws/cars', views.get_cars, name='get_cars'),
-    path('ws/car', views.get_car, name='get_car'),
-    path('ws/carcre', views.car_create, name='car_create'),
-    path('ws/carsearch', views.car_search, name='car_search'),
-    path('ws/carupdate', views.update_car, name='car_update'),
+    path('ws/car', views.car_get),
+    path('ws/cars', views.cars_get),
+    path('ws/carsearch', views.car_search),
+    path('ws/carcreate', views.car_create),
+    path('ws/carupdate', views.car_update),
     # Circuit
-    path('ws/circuits', views.get_circuits, name='get_circuits'),
-    path('ws/circuit', views.get_circuit, name='get_circuit'),
-    path('ws/circuitcre', views.new_circuit, name='circuit_create'),
-    path('ws/circuitsearch', views.search_circuits, name='circuit_search'),
-    path('ws/circuitupdate', views.update_circuit, name='circuit_update'),
+    path('ws/circuit', views.circuit_get),
+    path('ws/circuits', views.circuits_get),
+    path('ws/circuitsearch', views.circuit_search),
+    path('ws/circuitcreate', views.circuit_create),
+    path('ws/circuitupdate', views.circuit_update),
     # Country
-    path('ws/countries', views.get_countries, name='countries_get'),
-    path('ws/countrysearch', views.search_countries, name='countries_search'),
-    path('ws/country', views.get_country, name='country_get'),
-    path('ws/countriycre', views.new_country, name='countries_new'),
-    path('ws/countryupdate', views.update_country, name='countries_edit'),
+    path('ws/country', views.country_get),
+    path('ws/countries', views.countries_get),
+    path('ws/countrysearch', views.country_search),
+    path('ws/countrycreate', views.country_create),
+    path('ws/countryupdate', views.country_update),
     # Pilot
-    path('ws/pilots', views.get_pilots, name='pilots_list'),
-    path('ws/pilotsearch', views.search_pilots, name='pilots_search'),
-    path('ws/pilot', views.get_pilot, name='pilots_get'),
-    path('ws/pilotcre', views.add_pilot, name='pilots_new'),
-    path('ws/pilotupdate', views.update_pilot, name='pilots_edit'),
+    path('ws/pilot', views.pilot_get),
+    path('ws/pilots', views.pilots_get),
+    path('ws/pilotsearch', views.pilot_search),
+    path('ws/pilotcreate', views.pilot_create),
+    path('ws/pilotupdate', views.pilot_update),
     # Race
-    path('ws/races', views.get_races, name='races_list'),
-    path('ws/racesearch', views.search_races, name='races_search'),
-    path('ws/race', views.get_race, name='races_get'),
-    path('ws/racecre', views.new_race, name='races_new'),
-    path('ws/raceupdate', views.update_race, name='races_edit'),
+    path('ws/race', views.race_get),
+    path('ws/races', views.races_get),
+    path('ws/racesearch', views.race_search),
+    path('ws/racecreate', views.race_create),
+    path('ws/raceupdate', views.race_update),
     # Result
-    #path('results/', views.results_list, name='results_list'),
-    #path('results/search/', views.results_search, name='results_search'),
-    path('ws/result', views.get_result, name='results_get'),
-    path('ws/resultcre', views.new_result, name='results_new'),
-    path('ws/resultupdate', views.update_result, name='results_edit'),
+    path('ws/result', views.result_get),
+
+
+    path('ws/resultcreate', views.result_create),
+    path('ws/resultupdate', views.result_update),
     # Team
-    path('ws/teams', views.get_teams, name='teams_list'),
-    path('ws/teamsearch', views.search_team, name='teams_search'),
-    path('ws/team', views.get_team, name='teams_get'),
-    path('ws/teamscre', views.new_team, name='teams_new'),
-    path('ws/teamsupdate', views.update_team, name='teams_edit'),
+    path('ws/team', views.team_get),
+    path('ws/teams', views.teams_get),
+    path('ws/teamsearch', views.team_search),
+    path('ws/teamcreate', views.team_create),
+    path('ws/teamupdate', views.team_update),
     # Team Leader
-    path('ws/teamleaders', views.get_teamleaders, name='teamleaders_list'),
-    path('ws/teamleadersearch', views.search_teamleader, name='teamleaders_search'),
-    path('ws/teamleader', views.get_teamleader, name='teamleaders_get'),
-    path('ws/teamleadercre', views.new_teamleader, name='teamleaders_new'),
-    path('ws/teamleaderupdate', views.update_teamleader, name='teamleaders_edit'),
-
-    # Template
-    path('template_index/', views.template_index, name='template_index'),
-
+    path('ws/teamleader', views.teamleader_get),
+    path('ws/teamleaders', views.teamleaders_get),
+    path('ws/teamleadersearch', views.teamleader_search),
+    path('ws/teamleadercreate', views.teamleader_create),
+    path('ws/teamleaderupdate', views.teamleader_update),
     # Profile
-    path('profile/', views.profile, name='profile'),
-    path('profile/edit/', views.profile_edit, name='profile_edit'),
-
+    path('ws/profile', views.profile_get),
+    path('ws/profileupdate', views.profile_update),
     # Pilot Favourites
-    # Add to Favourite
-    path('pilot/favourite/<int:pilot_id>', views.pilot_add_to_favourite, name='pilot_add_to_favourite'),
-    # Remove from Favourite
-    path('pilot/remove/<int:pilot_id>', views.pilot_remove_from_favourite, name='pilot_remove_from_favourite'),
-
-
+    path('ws/pilotfavadd', views.pilot_fav_add),
+    path('ws/pilotfavrem', views.pilot_fav_rem),
     # Team Favourites
-    # Add to Favourite
-    path('team/favourite/<int:team_id>', views.team_add_to_favourite, name='team_add_to_favourite'),
-    # Remove from Favourite
-    path('team/remove/<int:team_id>', views.team_remove_from_favourite, name='team_remove_from_favourite'),
-
+    path('ws/teamfavadd', views.team_fav_add),
+    path('ws/teamfavrem', views.team_fav_rem),
 ]

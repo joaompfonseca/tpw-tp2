@@ -38,7 +38,7 @@ from app.serializers import *
 #    return render(req, 'home.html', ctx)
 
 
-# AUTH
+# Auth
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -85,92 +85,24 @@ def user_get(req):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-# Profile
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_profile(req):
-    profile = Profile.objects.get(user=req.user)
-    t = ProfileSerializer(profile)
-    return Response(t.data)
-
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update_profile(req):
-    profile = Profile.objects.get(user=req.user)
-    serializer = ProfileSerializer(profile, data=req.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# Pilot Favourites
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def pilot_add_to_favourite(req):
-    user_profile = Profile.objects.get(user=req.user)
-    pilot = Pilot.objects.get(id=req.data['id'])
-    user_profile.favourite_pilot.add(pilot)
-    user_profile.save()
-    return Response(status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def pilot_remove_from_favourites(req):
-    user_profile = Profile.objects.get(user=req.user)
-    pilot = Pilot.objects.get(id=req.data['id'])
-    user_profile.favourite_pilot.remove(pilot)
-    user_profile.save()
-    return Response(status=status.HTTP_200_OK)
-
-
-# Team Favourites
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def team_add_to_favourite(req):
-    user_profile = Profile.objects.get(user=req.user)
-    team = Team.objects.get(id=req.data['id'])
-    user_profile.favourite_team.add(team)
-    user_profile.save()
-    return Response(status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def team_remove_from_favourites(req):
-    user_profile = Profile.objects.get(user=req.user)
-    team = Team.objects.get(id=req.data['id'])
-    user_profile.favourite_team.remove(team)
-    user_profile.save()
-    return Response(status=status.HTTP_200_OK)
-
-
 # Car
 
-
 @api_view(['GET'])
-def get_cars(req):
-    cars = Car.objects.all()
-    serializer = CarSerializer(cars, many=True)
+def car_get(req):
+    _id = int(req.GET['id'])
+    try:
+        car = Car.objects.get(id=_id)
+    except Car.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = CarSerializer(car)
     return Response(serializer.data)
 
 
-@api_view(['POST'])
-@permission_classes([IsAdminUser])
-def car_create(req):
-    serializer = CarSerializer(data=req.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+def cars_get(req):
+    cars = Car.objects.all()
+    serializer = CarSerializer(cars, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -199,23 +131,22 @@ def car_search(req):
     return Response(req.session['searched'][query])
 
 
-@api_view(['GET'])
-def get_car(req):
-    id = str(req.GET['id'])
-    try:
-        car = Car.objects.get(id=id)
-    except Car.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    serializer = CarSerializer(car)
-    return Response(serializer.data)
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def car_create(req):
+    serializer = CarSerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def update_car(req):
-    id = str(req.GET['id'])
+def car_update(req):
+    _id = int(req.GET['id'])
     try:
-        car = Car.objects.get(id=id)
+        car = Car.objects.get(id=_id)
     except Car.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CarSerializer(car, data=req.data)
@@ -228,15 +159,27 @@ def update_car(req):
 # Circuit
 
 @api_view(['GET'])
-def get_circuits(req):
+def circuit_get(req):
+    _id = int(req.GET['id'])
+    try:
+        circuit = Circuit.objects.get(id=_id)
+        races = Race.objects.filter(circuit=circuit)
+    except Circuit.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = CircuitSerializer(circuit)
+    serializer1 = RaceSerializer(races, many=True)
+    return Response({'circuit': serializer.data, 'races': serializer1.data})
+
+
+@api_view(['GET'])
+def circuits_get(req):
     circuits = Circuit.objects.all()
-    print(circuits[0].id)
     serializer = CircuitSerializer(circuits, many=True)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
-def search_circuits(req):
+def circuit_search(req):
     name = str(req.GET['name'])
     query = f'Circuit.name={name}'
     if 'searched' in req.session:
@@ -258,22 +201,9 @@ def search_circuits(req):
     return Response(req.session['searched'][query])
 
 
-@api_view(['GET'])
-def get_circuit(req):
-    id = str(req.GET['id'])
-    try:
-        circuit = Circuit.objects.get(id=id)
-        races = Race.objects.filter(circuit=circuit)
-    except Circuit.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    serializer = CircuitSerializer(circuit)
-    serializer1 = RaceSerializer(races, many=True)
-    return Response({'circuit': serializer.data, 'races': serializer1.data})
-
-
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
-def new_circuit(req):
+def circuit_create(req):
     serializer = CircuitSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -283,10 +213,10 @@ def new_circuit(req):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def update_circuit(req):
-    id = str(req.GET['id'])
+def circuit_update(req):
+    _id = int(req.GET['id'])
     try:
-        circuit = Circuit.objects.get(id=id)
+        circuit = Circuit.objects.get(id=_id)
     except Circuit.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CircuitSerializer(circuit, data=req.data)
@@ -299,17 +229,10 @@ def update_circuit(req):
 # Country
 
 @api_view(['GET'])
-def get_countries(req):
-    countries = Country.objects.all()
-    serializer = CountrySerializer(countries, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def get_country(req):
-    id = str(req.GET['id'])
+def country_get(req):
+    _id = int(req.GET['id'])
     try:
-        country = Country.objects.get(id=id)
+        country = Country.objects.get(id=_id)
         pilots = Pilot.objects.filter(country=country)
     except Country.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -318,18 +241,15 @@ def get_country(req):
     return Response({'country': serializer.data, 'pilots': serializer1.data})
 
 
-@api_view(['POST'])
-@permission_classes([IsAdminUser])
-def new_country(req):
-    serializer = CountrySerializer(data=req.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+def countries_get(req):
+    countries = Country.objects.all()
+    serializer = CountrySerializer(countries, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
-def search_countries(req):
+def country_search(req):
     designation = str(req.GET['designation'])
     query = f'Country.designation={designation}'
     if 'searched' in req.session:
@@ -351,12 +271,22 @@ def search_countries(req):
     return Response(req.session['searched'][query])
 
 
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def country_create(req):
+    serializer = CountrySerializer(data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def update_country(req):
-    id = str(req.GET['id'])
+def country_update(req):
+    _id = int(req.GET['id'])
     try:
-        country = Country.objects.get(id=id)
+        country = Country.objects.get(id=_id)
     except Country.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CountrySerializer(country, data=req.data)
@@ -368,16 +298,38 @@ def update_country(req):
 
 # Pilot
 
+@api_view(['GET'])
+def pilot_get(req):
+    _id = int(req.GET['id'])
+    try:
+        serializer2 = None
+        pilot = Pilot.objects.get(id=_id)
+        if not isinstance(req.user, AnonymousUser):
+            if pilot in Profile.objects.get(user=req.user).favourite_pilot.all():
+                is_fav = True
+            else:
+                is_fav = False
+            serializer2 = FavSerializer({'is_fav': is_fav})
+        results = Result.objects.filter(pilot=pilot).order_by('-race__date')
+    except Pilot.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = PilotSerializer(pilot)
+    serializer1 = ResultSerializer(results, many=True)
+    if serializer2:
+        return Response({'pilot': serializer.data, 'results': serializer1.data, 'is_fav': serializer2.data})
+    else:
+        return Response({'pilot': serializer.data, 'results': serializer1.data})
+
 
 @api_view(['GET'])
-def get_pilots(req):
+def pilots_get(req):
     pilots = Pilot.objects.all()
     serializer = PilotSerializer(pilots, many=True)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
-def search_pilots(req):
+def pilot_search(req):
     name = str(req.GET['name'])
     query = f'Pilot.name={name}'
     if 'searched' in req.session:
@@ -399,32 +351,9 @@ def search_pilots(req):
     return Response(req.session['searched'][query])
 
 
-@api_view(['GET'])
-def get_pilot(req):
-    id = str(req.GET['id'])
-    try:
-        serializer2 = None
-        pilot = Pilot.objects.get(id=id)
-        if not isinstance(req.user, AnonymousUser):
-            if pilot in Profile.objects.get(user=req.user).favourite_pilot.all():
-                is_fav = True
-            else:
-                is_fav = False
-            serializer2 = FavSerializer({'is_fav': is_fav})
-        results = Result.objects.filter(pilot=pilot).order_by('-race__date')
-    except Pilot.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    serializer = PilotSerializer(pilot)
-    serializer1 = ResultSerializer(results, many=True)
-    if serializer2:
-        return Response({'pilot': serializer.data, 'results': serializer1.data, 'is_fav': serializer2.data})
-    else:
-        return Response({'pilot': serializer.data, 'results': serializer1.data})
-
-
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
-def add_pilot(req):
+def pilot_create(req):
     serializer = PilotSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -434,10 +363,10 @@ def add_pilot(req):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def update_pilot(req):
-    id = str(req.GET['id'])
+def pilot_update(req):
+    _id = int(req.GET['id'])
     try:
-        pilot = Pilot.objects.get(id=id)
+        pilot = Pilot.objects.get(id=_id)
     except Pilot.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = PilotSerializer(pilot, data=req.data)
@@ -450,14 +379,27 @@ def update_pilot(req):
 # Race
 
 @api_view(['GET'])
-def get_races(req):
+def race_get(req):
+    _id = int(req.GET['id'])
+    try:
+        race = Race.objects.get(id=_id)
+        results = Result.objects.filter(race=race).order_by('position')
+    except Race.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = RaceSerializer(race)
+    serializer1 = ResultSerializer(results, many=True)
+    return Response({'race': serializer.data, 'results': serializer1.data})
+
+
+@api_view(['GET'])
+def races_get(req):
     races = Race.objects.all()
     serializer = RaceSerializer(races, many=True)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
-def search_races(req):
+def race_search(req):
     name = str(req.GET['name'])
     query = f'Race.name={name}'
     if 'searched' in req.session:
@@ -479,22 +421,9 @@ def search_races(req):
     return Response(req.session['searched'][query])
 
 
-@api_view(['GET'])
-def get_race(req):
-    id = str(req.GET['id'])
-    try:
-        race = Race.objects.get(id=id)
-        results = Result.objects.filter(race=race).order_by('position')
-    except Race.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    serializer = RaceSerializer(race)
-    serializer1 = ResultSerializer(results, many=True)
-    return Response({'race': serializer.data, 'results': serializer1.data})
-
-
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
-def new_race(req):
+def race_create(req):
     serializer = RaceSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -504,10 +433,10 @@ def new_race(req):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def update_race(req):
-    id = str(req.GET['id'])
+def race_update(req):
+    _id = int(req.GET['id'])
     try:
-        race = Race.objects.get(id=id)
+        race = Race.objects.get(id=_id)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = RaceSerializer(race, data=req.data)
@@ -519,48 +448,11 @@ def update_race(req):
 
 # Result
 
-"""
-def results_list(req):
-    results = Result.objects.all()
-    actions = [{'str': 'Search Result', 'url': '/results/search'}]
-    if req.user.is_authenticated and req.user.username == 'admin':
-        actions += [{'str': 'New Result', 'url': '/results/new'}]
-    lst = [[{'str': r.pilot, 'url': f'/results/{r.id}'}] for r in results]
-
-    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[-1] if req.user.is_authenticated else None,'header': 'List of Results', 'actions': actions, 'list': lst}
-    return render(req, 'list.html', ctx)
-
-
-def results_search(req):
-    # If POST request, process form data
-    if req.method == 'POST':
-        # Create a form instance and pass data to it
-        form = ResultSearchForm(req.POST)
-        if form.is_valid():
-            pilot = form.cleaned_data['pilot']
-            race = form.cleaned_data['race']
-
-            query = f'Result.pilot={pilot};Result.race={race}'
-            # if 'searched' in req.session and req.session['searched'] == query:
-            #     return HttpResponse('You have searched for the same thing before. Please try again.')
-            # req.session['searched'] = query
-
-            result = Result.objects.filter(Q(pilot=pilot) & Q(race=race))
-
-            return redirect('results_get', _id=result[0].id)
-    else:
-        # If GET (or any other method), create blank form
-        form = ResultSearchForm()
-        ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[-1] if req.user.is_authenticated else None,'header': 'Search Result', 'form': form}
-        return render(req, 'search.html', ctx)
-"""
-
-
 @api_view(['GET'])
-def get_result(req):
-    id = str(req.GET['id'])
+def result_get(req):
+    _id = int(req.GET['id'])
     try:
-        result = Result.objects.get(id=id)
+        result = Result.objects.get(id=_id)
     except Result.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = ResultSerializer(result)
@@ -569,7 +461,7 @@ def get_result(req):
 
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
-def new_result(req):
+def result_create(req):
     serializer = ResultSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -579,10 +471,10 @@ def new_result(req):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def update_result(req):
-    id = str(req.GET['id'])
+def result_update(req):
+    _id = int(req.GET['id'])
     try:
-        result = Result.objects.get(id=id)
+        result = Result.objects.get(id=_id)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = ResultSerializer(result, data=req.data)
@@ -594,13 +486,12 @@ def update_result(req):
 
 # Team
 
-
 @api_view(['GET'])
-def get_team(req):
-    id = str(req.GET['id'])
+def team_get(req):
+    _id = int(req.GET['id'])
     serializer2 = None
     try:
-        team = Team.objects.get(id=id)
+        team = Team.objects.get(id=_id)
         if not isinstance(req.user, AnonymousUser):
             if team in Profile.objects.get(user=req.user).favourite_team.all():
                 faved = True
@@ -619,7 +510,14 @@ def get_team(req):
 
 
 @api_view(['GET'])
-def search_team(req):
+def teams_get(req):
+    teams = Team.objects.all()
+    serializer = TeamSerializer(teams, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def team_search(req):
     name = str(req.GET['name'])
     query = f'Team.name={name}'
     if 'searched' in req.session:
@@ -641,16 +539,9 @@ def search_team(req):
     return Response(req.session['searched'][query])
 
 
-@api_view(['GET'])
-def get_teams(req):
-    teams = Team.objects.all()
-    serializer = TeamSerializer(teams, many=True)
-    return Response(serializer.data)
-
-
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
-def new_team(req):
+def team_create(req):
     serializer = TeamSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -660,10 +551,10 @@ def new_team(req):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def update_team(req):
-    id = str(req.GET['id'])
+def team_update(req):
+    _id = int(req.GET['id'])
     try:
-        team = Team.objects.get(id=id)
+        team = Team.objects.get(id=_id)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = TeamSerializer(team, data=req.data)
@@ -676,14 +567,25 @@ def update_team(req):
 # TeamLeader
 
 @api_view(['GET'])
-def get_teamleaders(req):
+def teamleader_get(req):
+    _id = int(req.GET['id'])
+    try:
+        teamleader = TeamLeader.objects.get(id=_id)
+    except TeamLeader.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer = TeamLeaderSerializer(teamleader)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def teamleaders_get(req):
     teamleaders = TeamLeader.objects.all()
     serializer = TeamLeaderSerializer(teamleaders, many=True)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
-def search_teamleader(req):
+def teamleader_search(req):
     name = str(req.GET['name'])
     query = f'TeamLeader.name={name}'
     if 'searched' in req.session:
@@ -705,20 +607,9 @@ def search_teamleader(req):
     return Response(req.session['searched'][query])
 
 
-@api_view(['GET'])
-def get_teamleader(req):
-    id = str(req.GET['id'])
-    try:
-        teamleader = TeamLeader.objects.get(id=id)
-    except TeamLeader.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    serializer = TeamLeaderSerializer(teamleader)
-    return Response(serializer.data)
-
-
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
-def new_teamleader(req):
+def teamleader_create(req):
     serializer = TeamLeaderSerializer(data=req.data)
     if serializer.is_valid():
         serializer.save()
@@ -728,10 +619,10 @@ def new_teamleader(req):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def update_teamleader(req):
-    id = str(req.GET['id'])
+def teamleader_update(req):
+    _id = int(req.GET['id'])
     try:
-        teamleader = TeamLeader.objects.get(id=id)
+        teamleader = TeamLeader.objects.get(id=_id)
     except TeamLeader.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = TeamLeaderSerializer(teamleader, data=req.data)
@@ -741,5 +632,70 @@ def update_teamleader(req):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def template_index(req):
-    return render(req, 'template_index.html')
+# Profile
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile_get(req):
+    profile = Profile.objects.get(user=req.user)
+    t = ProfileSerializer(profile)
+    return Response(t.data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def profile_update(req):
+    profile = Profile.objects.get(user=req.user)
+    serializer = ProfileSerializer(profile, data=req.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Pilot Favourites
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def pilot_fav_add(req):
+    _id = int(req.GET['id'])
+    user_profile = Profile.objects.get(user=req.user)
+    pilot = Pilot.objects.get(id=_id)
+    user_profile.favourite_pilot.add(pilot)
+    user_profile.save()
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def pilot_fav_rem(req):
+    _id = int(req.GET['id'])
+    user_profile = Profile.objects.get(user=req.user)
+    pilot = Pilot.objects.get(id=_id)
+    user_profile.favourite_pilot.remove(pilot)
+    user_profile.save()
+    return Response(status=status.HTTP_200_OK)
+
+
+# Team Favourites
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def team_fav_add(req):
+    _id = int(req.GET['id'])
+    user_profile = Profile.objects.get(user=req.user)
+    team = Team.objects.get(id=_id)
+    user_profile.favourite_team.add(team)
+    user_profile.save()
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def team_fav_rem(req):
+    _id = int(req.GET['id'])
+    user_profile = Profile.objects.get(user=req.user)
+    team = Team.objects.get(id=_id)
+    user_profile.favourite_team.remove(team)
+    user_profile.save()
+    return Response(status=status.HTTP_200_OK)
