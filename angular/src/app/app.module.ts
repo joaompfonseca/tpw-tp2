@@ -14,7 +14,6 @@ import { NewComponent } from './new/new.component';
 import { PilotComponent } from './pilot/pilot.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RaceComponent } from './race/race.component';
-import { ResultComponent } from './result/result.component';
 import { SearchComponent } from './search/search.component';
 import { SignupComponent } from './signup/signup.component';
 import { TeamComponent } from './team/team.component';
@@ -38,7 +37,6 @@ import {HttpClientModule} from '@angular/common/http';
     PilotComponent,
     ProfileComponent,
     RaceComponent,
-    ResultComponent,
     SearchComponent,
     SignupComponent,
     TeamComponent,

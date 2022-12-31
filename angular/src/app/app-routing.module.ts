@@ -12,7 +12,6 @@ import {CircuitComponent} from "./circuit/circuit.component";
 import {CountryComponent} from "./country/country.component";
 import {PilotComponent} from "./pilot/pilot.component";
 import {RaceComponent} from "./race/race.component";
-import {ResultComponent} from "./result/result.component";
 import {TeamComponent} from "./team/team.component";
 import {TeamleaderComponent} from "./teamleader/teamleader.component";
 import {ProfileComponent} from "./profile/profile.component";
