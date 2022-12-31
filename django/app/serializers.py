@@ -3,6 +3,24 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 
+class StatsSerializer(serializers.Serializer):
+    total_pilots = serializers.IntegerField()
+    total_teams = serializers.IntegerField()
+    total_races = serializers.IntegerField()
+
+
+class LeaderboardSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    points = serializers.IntegerField()
+
+
+class HomeSerializer(serializers.Serializer):
+    stats = StatsSerializer()
+    pilots_leaderboard = LeaderboardSerializer(many=True)
+    teams_leaderboard = LeaderboardSerializer(many=True)
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -41,7 +59,8 @@ class PilotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pilot
         fields = (
-            'id', 'name', 'date', 'victories', 'pole_positions', 'podiums', 'championships', 'contract', 'entry_year', 'team',
+            'id', 'name', 'date', 'victories', 'pole_positions', 'podiums', 'championships', 'contract', 'entry_year',
+            'team',
             'country', 'image')
 
 
@@ -92,6 +111,7 @@ class HeaderSerializer(serializers.Serializer):
 class AuthSerializer(serializers.Serializer):
     is_authenticated = serializers.BooleanField()
     is_superuser = serializers.BooleanField()
+
 
 class PointsSerializer(serializers.Serializer):
     points = serializers.IntegerField()

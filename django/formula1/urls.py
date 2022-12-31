@@ -22,6 +22,8 @@ from app import views
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
+    # Home
+    path('ws/home', views.home),
     # Auth
     path('ws/login', views.LoginAPI.as_view()),
     path('ws/logout', views.LogoutAPI.as_view()),

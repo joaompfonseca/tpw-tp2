@@ -18,28 +18,43 @@ from app.serializers import *
 
 # Home
 
-# def home(req):
-#    pilots_leaderboard = []
-#    teams_leaderboard = []
-#
-#    stats = {'total_races': Race.objects.count(),
-#             'total_pilots': Pilot.objects.count(), 'total_teams': Team.objects.count()}
-#    for pilot in Pilot.objects.all():
-#        pilots_leaderboard.append({'pilot': pilot, 'points': pilot.total_points})
-#    pilots_leaderboard.sort(key=lambda x: x['points'], reverse=True)
-#
-#    for team in Team.objects.all():
-#        teams_leaderboard.append({'team': team,
-#                                  'points': sum([pilot.total_points for pilot in Pilot.objects.filter(team=team)])})
-#    teams_leaderboard.sort(key=lambda x: x['points'], reverse=True)
-#    ctx = {'image': 'images/profiles/' + Profile.objects.get(user=get_user(req)).profile_image.url.split('/')[
-#        -1] if req.user.is_authenticated else None,
-#           'pilots_leaderboard': pilots_leaderboard, 'stats': stats, 'teams_leaderboard': teams_leaderboard}
-#    return render(req, 'home.html', ctx)
+@api_view(['GET'])
+def home(req):
+    # Stats
+    stats_s = StatsSerializer({
+        'total_pilots': Pilot.objects.count(),
+        'total_teams': Team.objects.count(),
+        'total_races': Race.objects.count()
+    })
+
+    # Pilots Leaderboard
+    pilots_lb = []
+    for pilot in Pilot.objects.all():
+        pilots_lb.append({'id': pilot.id,
+                          'name': pilot.name,
+                          'points': pilot.total_points})
+    pilots_lb.sort(key=lambda x: x['points'], reverse=True)
+    pilots_lb_s = LeaderboardSerializer(pilots_lb, many=True)
+
+    # Teams Leaderboard
+    teams_lb = []
+    for team in Team.objects.all():
+        teams_lb.append({'id': team.id,
+                         'name': team.name,
+                         'points': sum([pilot.total_points for pilot in Pilot.objects.filter(team=team)])})
+    teams_lb.sort(key=lambda x: x['points'], reverse=True)
+    teams_lb_s = LeaderboardSerializer(teams_lb, many=True)
+
+    home_s = HomeSerializer({
+        'stats': stats_s.data,
+        'pilots_leaderboard': pilots_lb_s.data,
+        'teams_leaderboard': teams_lb_s.data
+    })
+
+    return Response(home_s.data)
 
 
 # Auth
-
 
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -103,7 +118,8 @@ def car_get(req):
     except Car.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CarSerializer(car)
-    return Response({'car': serializer.data, 'pilot': pa.data, 'team': ta.data, 'header': header.data, 'auth': auth.data})
+    return Response(
+        {'car': serializer.data, 'pilot': pa.data, 'team': ta.data, 'header': header.data, 'auth': auth.data})
 
 
 @api_view(['GET'])
@@ -184,7 +200,9 @@ def circuit_get(req):
     header = HeaderSerializer({'header': 'Circuit Details'})
     country = CountrySerializer(country)
     pilot = PilotSerializer(last_winner)
-    return Response({'circuit': serializer.data, 'races': serializer1.data, 'country': country.data, 'last_winner': pilot.data, 'auth': auth.data, 'header': header.data})
+    return Response(
+        {'circuit': serializer.data, 'races': serializer1.data, 'country': country.data, 'last_winner': pilot.data,
+         'auth': auth.data, 'header': header.data})
 
 
 @api_view(['GET'])
@@ -260,7 +278,9 @@ def country_get(req):
     circuits = CircuitSerializer(circuits, many=True)
     header = HeaderSerializer({'header': 'Country Details'})
     auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
-    return Response({'country': serializer.data, 'pilots': serializer1.data, 'circuits': circuits.data, 'auth': auth.data, 'header': header.data})
+    return Response(
+        {'country': serializer.data, 'pilots': serializer1.data, 'circuits': circuits.data, 'auth': auth.data,
+         'header': header.data})
 
 
 @api_view(['GET'])
@@ -357,9 +377,14 @@ def pilot_get(req):
     auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
     points = PointsSerializer({'points': points})
     if serializer2:
-        return Response({'pilot': serializer.data, 'results': serializer1.data, 'is_fav': serializer2.data, 'header': header.data, 'auth': auth.data, 'team': serializer3.data, 'country': serializer4.data, 'points': points.data, 'races': serializer5.data})
+        return Response(
+            {'pilot': serializer.data, 'results': serializer1.data, 'is_fav': serializer2.data, 'header': header.data,
+             'auth': auth.data, 'team': serializer3.data, 'country': serializer4.data, 'points': points.data,
+             'races': serializer5.data})
     else:
-        return Response({'pilot': serializer.data, 'results': serializer1.data, 'header': header.data, 'auth': auth.data, 'team': serializer3.data, 'country': serializer4.data, 'points': points.data, 'races': serializer5.data})
+        return Response(
+            {'pilot': serializer.data, 'results': serializer1.data, 'header': header.data, 'auth': auth.data,
+             'team': serializer3.data, 'country': serializer4.data, 'points': points.data, 'races': serializer5.data})
 
 
 def pilot_points(id):
@@ -448,7 +473,8 @@ def race_get(req):
     serializer3 = PilotSerializer(pilots, many=True)
     header = HeaderSerializer({'header': 'Race Details'})
     auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
-    return Response({'race': serializer.data, 'results': serializer1.data, 'header': header.data, 'auth': auth.data, 'circuit': serializer2.data, 'pilots': serializer3.data})
+    return Response({'race': serializer.data, 'results': serializer1.data, 'header': header.data, 'auth': auth.data,
+                     'circuit': serializer2.data, 'pilots': serializer3.data})
 
 
 @api_view(['GET'])
@@ -577,9 +603,12 @@ def team_get(req):
     header = HeaderSerializer({'header': 'Team Details'})
     auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
     if serializer2:
-        return Response({'team': serializer.data, 'pilots': serializer1.data, 'fav': serializer2.data, 'header': header.data, 'auth': auth.data, 'teamleader': serializer3.data, 'points': points.data})
+        return Response(
+            {'team': serializer.data, 'pilots': serializer1.data, 'fav': serializer2.data, 'header': header.data,
+             'auth': auth.data, 'teamleader': serializer3.data, 'points': points.data})
     else:
-        return Response({'team': serializer.data, 'pilots': serializer1.data, 'header': header.data, 'auth': auth.data, 'teamleader': serializer3.data, 'points': points.data})
+        return Response({'team': serializer.data, 'pilots': serializer1.data, 'header': header.data, 'auth': auth.data,
+                         'teamleader': serializer3.data, 'points': points.data})
 
 
 @api_view(['GET'])
