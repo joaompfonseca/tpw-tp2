@@ -26,51 +26,48 @@ const routes = [
   {path: 'signup', component: SignupComponent},
   // Car
   {path: 'cars', component: ListComponent, data: {type: 'car'}},
+  {path: 'cars/new', component: NewComponent, data: {type: 'car'}},
   {path: 'cars/search', component: SearchComponent, data: {type: 'car'}},
   {path: 'cars/:id', component: CarComponent},
-  {path: 'cars/new', component: NewComponent, data: {type: 'car'}},
   {path: 'cars/:id/edit', component: EditComponent, data: {type: 'car'}},
   // Circuit
   {path: 'circuits', component: ListComponent, data: {type: 'circuit'}},
+  {path: 'circuits/new', component: NewComponent, data: {type: 'circuit'}},
   {path: 'circuits/search', component: SearchComponent, data: {type: 'circuit'}},
   {path: 'circuits/:id', component: CircuitComponent},
-  {path: 'circuits/new', component: NewComponent, data: {type: 'circuit'}},
   {path: 'circuits/:id/edit', component: EditComponent, data: {type: 'circuit'}},
   // Country
   {path: 'countries', component: ListComponent, data: {type: 'country'}},
+  {path: 'countries/new', component: NewComponent, data: {type: 'country'}},
   {path: 'countries/search', component: SearchComponent, data: {type: 'country'}},
   {path: 'countries/:id', component: CountryComponent},
-  {path: 'countries/new', component: NewComponent, data: {type: 'country'}},
   {path: 'countries/:id/edit', component: EditComponent, data: {type: 'country'}},
   // Pilot
   {path: 'pilots', component: ListComponent, data: {type: 'pilot'}},
+  {path: 'pilots/new', component: NewComponent, data: {type: 'pilot'}},
   {path: 'pilots/search', component: SearchComponent, data: {type: 'pilot'}},
   {path: 'pilots/:id', component: PilotComponent},
-  {path: 'pilots/new', component: NewComponent, data: {type: 'pilot'}},
   {path: 'pilots/:id/edit', component: EditComponent, data: {type: 'pilot'}},
   // Race
   {path: 'races', component: ListComponent, data: {type: 'race'}},
+  {path: 'races/new', component: NewComponent, data: {type: 'race'}},
   {path: 'races/search', component: SearchComponent, data: {type: 'race'}},
   {path: 'races/:id', component: RaceComponent},
-  {path: 'races/new', component: NewComponent, data: {type: 'race'}},
   {path: 'races/:id/edit', component: EditComponent, data: {type: 'race'}},
   // Result
-
-
-  {path: 'results/:id', component: ResultComponent},
   {path: 'results/new', component: NewComponent, data: {type: 'result'}},
   {path: 'results/:id/edit', component: EditComponent, data: {type: 'result'}},
   // Team
   {path: 'teams', component: ListComponent, data: {type: 'team'}},
+  {path: 'teams/new', component: NewComponent, data: {type: 'team'}},
   {path: 'teams/search', component: SearchComponent, data: {type: 'team'}},
   {path: 'teams/:id', component: TeamComponent},
-  {path: 'teams/new', component: NewComponent, data: {type: 'team'}},
   {path: 'teams/:id/edit', component: EditComponent, data: {type: 'team'}},
   // Team Leader
   {path: 'teamleaders', component: ListComponent, data: {type: 'teamleader'}},
+  {path: 'teamleaders/new', component: NewComponent, data: {type: 'teamleader'}},
   {path: 'teamleaders/search', component: SearchComponent, data: {type: 'teamleader'}},
   {path: 'teamleaders/:id', component: TeamleaderComponent},
-  {path: 'teamleaders/new', component: NewComponent, data: {type: 'teamleader'}},
   {path: 'teamleaders/:id/edit', component: EditComponent, data: {type: 'teamleader'}},
   // Profile
   {path: 'profile', component: ProfileComponent},
