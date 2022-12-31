@@ -27,7 +27,7 @@ export class TeamLeaderService {
   }
 
   createTeamLeader(teamleader: TeamLeader): Observable<any> {
-    const url = this.baseURL + "teamleadercre";
+    const url = this.baseURL + "teamleadercreate";
     return this.http.post(url, teamleader, httpOptions)
   }
 

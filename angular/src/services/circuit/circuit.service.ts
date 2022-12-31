@@ -26,7 +26,7 @@ export class CircuitService {
   }
 
   createCircuit(circuit: Circuit): Observable<any> {
-    const url = this.baseURL + "circuitcre";
+    const url = this.baseURL + "circuitcreate";
     return this.http.post(url, circuit, httpOptions)
   }
 

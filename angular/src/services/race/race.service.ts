@@ -25,7 +25,7 @@ export class RaceService {
   }
 
   createRace(race: Race): Observable<any> {
-    const url = this.baseURL + "racecre";
+    const url = this.baseURL + "racecreate";
     return this.http.post(url, race, httpOptions)
   }
 

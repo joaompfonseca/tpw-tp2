@@ -26,7 +26,7 @@ export class CarService {
   }
 
   createCar(car: Car): Observable<any> {
-    const url = this.baseURL + "carcre";
+    const url = this.baseURL + "carcreate";
     return this.http.post(url, car, httpOptions)
   }
 

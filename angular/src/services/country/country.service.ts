@@ -26,7 +26,7 @@ export class CountryService {
   }
 
   createCountry(country: Country): Observable<any> {
-    const url = this.baseURL + "countrycre";
+    const url = this.baseURL + "countrycreate";
     return this.http.post(url, country, httpOptions)
   }
 

@@ -27,7 +27,7 @@ export class TeamService {
   }
 
   createTeam(team: Team): Observable<any> {
-    const url = this.baseURL + "teamcre";
+    const url = this.baseURL + "teamcreate";
     return this.http.post(url, team, httpOptions)
   }
 

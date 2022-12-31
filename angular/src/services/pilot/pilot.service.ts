@@ -28,7 +28,7 @@ export class PilotService {
   }
 
   createPilot(pilot: Pilot): Observable<any> {
-    const url = this.baseURL + "pilotcre";
+    const url = this.baseURL + "pilotcreate";
     return this.http.post(url, pilot, httpOptions)
   }
 

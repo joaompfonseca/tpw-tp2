@@ -20,7 +20,7 @@ export class ResultService {
   }
 
   createResult(result: Result): Observable<any> {
-    const url = this.baseURL + "resultcre";
+    const url = this.baseURL + "resultcreate";
     return this.http.post(url, result, httpOptions)
   }
 
