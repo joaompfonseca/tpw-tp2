@@ -66,7 +66,7 @@ class RaceSerializer(serializers.ModelSerializer):
 class ResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
-        fields = ('position', 'pilot', 'race', 'points')
+        fields = ('id', 'position', 'pilot', 'race', 'points')
 
 
 class TeamLeaderSerializer(serializers.ModelSerializer):
