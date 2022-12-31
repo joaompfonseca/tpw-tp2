@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {User} from "../../interfaces/user";
 import {Pilot} from "../../interfaces/pilot";
 import {Result} from "../../interfaces/result";
+import {PilotService} from "../../services/pilot/pilot.service";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-pilot',
@@ -14,87 +16,69 @@ export class PilotComponent implements OnInit {
   user: User;
   pilot: Pilot;
   results: Result[];
+  points: number;
+
   isFavourite: boolean;
   likeImage: string;
   dislikeImage: string;
+  pilotId: number;
 
-
-  constructor() {
-    // TODO: fetch the API
-    this.header = 'Pilot Details';
+  constructor(private route: ActivatedRoute, private pilotService: PilotService) {
+    this.header = '';
+    this.pilotId = 0;
     this.user = {
-      is_authenticated: true,
-      is_superuser: true,
-    };
+      is_authenticated: false,
+      is_superuser: false,
+    }
     this.pilot = {
-      id: 1,
-      name: 'Lewis Hamilton',
-      date: new Date('1985-01-07'),
-      victories: 84,
-      pole_positions: 98,
-      podiums: 155,
-      championships: 5,
-      points: 1000,
-      contract: 2022,
-      entry_year: 2007,
+      id: 0,
+      name: '',
+      country: [{
+        id: 0,
+        designation: '',
+        code: '',
+      }],
       team: {
-        id: 1,
-        name: 'Mercedes',
-      },
-      country: [
-        {
-          id: 1,
-          designation: 'United Kingdom',
-          code: 'GB',
-        }
-      ],
-      image: ''
-    };
-    this.results = [
-      {
-        id: 1,
-        position: 1,
-        pilot: {
-          id: 1,
-          name: 'Lewis Hamilton',
-          team: {
-            id: 1,
-            name: 'Mercedes',
-          }
-        },
-        race: {
-          id: 1,
-          name: 'Australian Grand Prix',
-          circuit: {
-            id: 1,
-            name: 'Albert Park Grand Prix Circuit',
-            last_winner: {
-              id: 5,
-              name: 'Daniel Ricciardo',
-              team: {
-                id: 5,
-                name: 'Renault',
-              }
-            },
-            country: {
-              id: 1,
-              designation: 'Australia',
-              code: 'AU',
-            }
-          }
-        },
-        points: 25,
+        id: 0,
+        name: '',
+        date: new Date(),
+        championships: 0,
+        image: '',},
+      victories: 0,
+      pole_positions: 0,
+      podiums: 0,
+      championships: 0,
+      contract: 0,
+      entry_year: 0,
+      image: '',
       }
-    ];
+    this.results = [];
+    this.points = 0;
     this.isFavourite = true;
     this.likeImage = '';
     this.dislikeImage = '';
   }
 
   ngOnInit() {
+    this.route.paramMap.subscribe(paramMap  => {
+      let id = paramMap.get('id');
+     if (id !== null) {
+       this.pilotId = +id;
+     }
+     this.getPilot();
+    })
   }
 
   getPilot() {
+    this.pilotService.getPilot(this.pilotId).subscribe(data => {
+      this.pilot = data.pilot;
+      this.pilot.country = data.country;
+      this.pilot.team = data.team;
+      this.results = data.results;
+      this.points = data.points.points;
+      this.user = data.auth;
+      this.header = data.header.header;
+    });
   }
 
   addToFavourites() {

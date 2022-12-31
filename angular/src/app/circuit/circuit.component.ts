@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {User} from "../../interfaces/user";
 import {Circuit} from "../../interfaces/circuit";
 import {Race} from "../../interfaces/race";
+import {ActivatedRoute} from "@angular/router";
+import {CircuitService} from "../../services/circuit/circuit.service";
 
 @Component({
   selector: 'app-circuit',
@@ -11,54 +13,52 @@ import {Race} from "../../interfaces/race";
 export class CircuitComponent implements OnInit {
 
   header: string;
+  circuitId: number;
   user: User;
   circuit: Circuit;
   races: Race[];
 
-  constructor() {
-    // TODO: fetch from API
-    this.header = 'Circuit Details';
+  constructor(private route: ActivatedRoute, private circuitService: CircuitService) {
+    this.header = '';
+    this.circuitId = 0;
     this.user = {
-      is_authenticated: true,
-      is_superuser: true,
+      is_authenticated: false,
+      is_superuser: false,
     };
     this.circuit = {
-      id: 1,
-      name: 'Albert Park',
-      length: 5.303,
-      location: 'Melbourne',
+      id: 0,
+      name: '',
       last_winner: {
-        id: 5,
-        name: 'Daniel Ricciardo',
+        id: 0,
+        name: '',
         team: {
-          id: 5,
-          name: 'Renault',
+          id: 0,
+          name: '',
         }
       },
       country: {
-        id: 1,
-        designation: 'Australia'
+        id: 0,
+        designation: ''
       }
     };
     this.races = [
       {
-        id: 1,
-        name: 'Australian Grand Prix',
+        id: 0,
+        name: '',
         circuit: {
-          id: 1,
-          name: 'Albert Park',
+          id: 0,
+          name: '',
           last_winner: {
-            id: 5,
-            name: 'Daniel Ricciardo',
+            id: 0,
+            name: '',
             team: {
-              id: 5,
-              name: 'Renault',
+              id: 0,
+              name: '',
             }
           },
           country: {
-            id: 1,
-            designation: 'Australia',
-            code: 'AU',
+            id: 0,
+            designation: '',
           }
         }
       }
@@ -66,8 +66,25 @@ export class CircuitComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.route.paramMap.subscribe(paramMap => {
+      let id = paramMap.get('id');
+      if (id !== null) {
+        this.circuitId = +id;
+      }
+      this.getCircuit();
+    })
   }
 
   getCircuit() {
+    this.circuitService.getCircuit(this.circuitId).subscribe(data => {
+      console.log(data);
+      this.header = data.header.header;
+      this.user = data.auth;
+      this.circuit = data.circuit;
+      this.circuit.country = data.country;
+      this.circuit.last_winner = data.last_winner;
+      this.races = data.races;
+
+    })
   }
 }

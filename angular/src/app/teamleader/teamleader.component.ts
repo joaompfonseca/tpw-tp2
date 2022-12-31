@@ -1,6 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {TeamLeader} from "../../interfaces/teamleader";
 import {User} from "../../interfaces/user";
+import {ActivatedRoute} from "@angular/router";
+import {TeamLeaderService} from "../../services/teamleader/team-leader.service";
+
 
 @Component({
   selector: 'app-teamleader',
@@ -10,37 +13,47 @@ import {User} from "../../interfaces/user";
 export class TeamleaderComponent implements OnInit {
 
   header: string;
+  teamleaderId: number;
   user: User;
   teamleader: TeamLeader;
 
-  constructor() {
-    // TODO: fetch from API
-    this.header = 'Team Leader Details';
+  constructor(private route: ActivatedRoute, private teamleaderService: TeamLeaderService) {
+    this.header = '';
+    this.teamleaderId = 0;
     this.user = {
-      is_authenticated: true,
-      is_superuser: true
+      is_authenticated: false,
+      is_superuser: false
     }
     this.teamleader = {
-      id: 1,
+      id: 0,
       image: '',
-      name: 'Toto Wolff',
+      name: '',
       team: {
-        id: 1,
-        name: 'Mercedes',
-        date: new Date('2010-01-01'),
-        championships: 5,
-        points: 1000,
-        image: ''
+        id: 0,
+        name: '',
       }
     };
   }
 
 
   ngOnInit() {
+    this.route.paramMap.subscribe(paramMap => {
+      let id = paramMap.get('id');
+      if (id !== null) {
+        this.teamleaderId = +id;
+      }
+      this.getTeamleader();
+    })
   }
 
   getTeamleader() {
-    // const id = +this.route.snapshot.paramMap.get('id');
-    // this.teamleaderService.getTeamleader(id).subscribe(teamleader => this.teamleader = teamleader);
+this.teamleaderService.getTeamLeader(this.teamleaderId).subscribe(data => {
+      console.log(data);
+      this.header = data.header.header;
+      this.user = data.auth;
+      this.teamleader = data.teamleader;
+      this.teamleader.team = data.team;
+    });
+
   }
 }

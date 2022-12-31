@@ -15,14 +15,16 @@ export class PilotService {
   private baseURL = 'http://localhost:8000/ws/';
   constructor(private http: HttpClient) { }
 
-  getPilot(id: number): Observable<Pilot> {
+  getPilot(id: number): Observable<any> {
     const url = this.baseURL + "pilot?id=" + id;
-    return this.http.get<Pilot>(url);
+    let pilot: Observable<any> = this.http.get<any>(url);
+    return pilot;
   }
 
   getPilots(): Observable<Pilot[]> {
     const url = this.baseURL + "pilots";
-    return this.http.get<Pilot[]>(url);
+    let pilots: Observable<Pilot[]> = this.http.get<Pilot[]>(url);
+    return pilots;
   }
 
   createPilot(pilot: Pilot): Observable<any> {

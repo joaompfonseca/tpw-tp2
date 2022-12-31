@@ -16,9 +16,9 @@ export class TeamService {
   private baseURL = 'http://localhost:8000/ws/';
   constructor(private http: HttpClient) { }
 
-  getTeam(id: number): Observable<Team> {
+  getTeam(id: number): Observable<any> {
     const url = this.baseURL + "team?id=" + id;
-    return this.http.get<Team>(url);
+    return this.http.get<any>(url);
   }
 
   getTeams(): Observable<Team[]> {

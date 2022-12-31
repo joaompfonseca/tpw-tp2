@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {Race} from "../../interfaces/race";
 import {User} from "../../interfaces/user";
 import {Result} from "../../interfaces/result";
+import {ActivatedRoute} from "@angular/router";
+import {RaceService} from "../../services/race/race.service";
 
 @Component({
   selector: 'app-race',
@@ -11,82 +13,99 @@ import {Result} from "../../interfaces/result";
 export class RaceComponent implements OnInit {
 
   header: string
+  raceId: number;
   user: User
   race: Race
   results: Result[]
 
-  constructor() {
-    // TODO: fetch from API
-    this.header = 'Race Details';
+  constructor(private route: ActivatedRoute, private raceService: RaceService) {
+    this.header = '';
+    this.raceId = 0;
     this.user = {
-      is_authenticated: true,
-      is_superuser: true
+      is_authenticated: false,
+      is_superuser: false
     };
     this.race = {
-      id: 1,
-      name: 'Australian Grand Prix',
-      date: new Date('2021-03-21'),
-      season: 2021,
-      fast_lap: '1:29.552',
+      id: 0,
+      name: '',
       circuit: {
-        id: 1,
-        name: 'Albert Park',
+        id: 0,
+        name: '',
         last_winner: {
-          id: 5,
-          name: 'Daniel Ricciardo',
+          id: 0,
+          name: '',
           team: {
-            id: 5,
-            name: 'Renault',
+            id: 0,
+            name: '',
           }
         },
         country: {
-          id: 1,
-          designation: 'Australia',
-          code: 'AU',
+          id: 0,
+          designation: '',
         }
       }
     };
     this.results = [
       {
-        id: 1,
-        position: 1,
+        id: 0,
+        position: 0,
         pilot: {
-          id: 1,
-          name: 'Lewis Hamilton',
+          id: 0,
+          name: '',
           team: {
-            id: 1,
-            name: 'Mercedes',
+            id: 0,
+            name: '',
           }
         },
         race: {
-          id: 1,
-          name: 'Australian Grand Prix',
+          id: 0,
+          name: '',
           circuit: {
-            id: 1,
-            name: 'Albert Park',
+            id: 0,
+            name: '',
             last_winner: {
-              id: 5,
-              name: 'Daniel Ricciardo',
+              id: 0,
+              name: '',
               team: {
-                id: 5,
-                name: 'Renault',
+                id: 0,
+                name: '',
               }
             },
             country: {
-              id: 1,
-              designation: 'Australia',
-              code: 'AU',
+              id: 0,
+              designation: '',
             }
           }
         },
-        points: 25
+        points: 0
       }
     ]
   }
 
   ngOnInit() {
+    this.route.paramMap.subscribe(paramMap  => {
+      let id = paramMap.get('id');
+      if (id !== null) {
+        this.raceId = +id;
+      }
+      this.getRace();
+    })
   }
 
   getRace() {
+    this.raceService.getRace(this.raceId).subscribe(data => {
+      console.log(data);
+      this.header = data.header.header;
+      this.race = data.race;
+      this.race.circuit = data.circuit;
+      this.user = data.auth;
+      let results = data.results;
+      let pilots = data.pilots;
+      for (let i = 0; i < results.length; i++) {
+        results[i].pilot = pilots[i].name;
+      }
+      this.results = data.results;
+
+    })
   }
 }

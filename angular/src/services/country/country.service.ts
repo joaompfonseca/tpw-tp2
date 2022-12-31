@@ -15,9 +15,9 @@ export class CountryService {
   private baseURL = 'http://localhost:8000/ws/';
   constructor(private http: HttpClient) { }
 
-  getCountry(id: number): Observable<Country> {
+  getCountry(id: number): Observable<any> {
     const url = this.baseURL + "country?id=" + id;
-    return this.http.get<Country>(url);
+    return this.http.get<any>(url);
   }
 
   getCountries(): Observable<Country[]> {

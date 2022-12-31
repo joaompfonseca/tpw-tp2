@@ -15,9 +15,9 @@ export class CarService {
   private baseURL = 'http://localhost:8000/ws/';
   constructor(private http: HttpClient) { }
 
-  getCar(id: number): Observable<Car> {
+  getCar(id: number): Observable<any> {
     const url = this.baseURL + "car?id=" + id;
-    return this.http.get<Car>(url);
+    return this.http.get<any>(url);
   }
 
   getCars(): Observable<Car[]> {

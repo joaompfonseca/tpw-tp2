@@ -2,6 +2,8 @@ import {Component} from '@angular/core';
 import {User} from "../../interfaces/user";
 import {Team} from "../../interfaces/team";
 import {Pilot} from "../../interfaces/pilot";
+import {ActivatedRoute} from "@angular/router";
+import {TeamService} from "../../services/team/team.service";
 
 @Component({
   selector: 'app-team',
@@ -14,62 +16,32 @@ export class TeamComponent {
   user: User;
   team: Team;
   pilots: Pilot[];
+  teamId: number;
   isFavourite: boolean;
   likeImage: string;
   dislikeImage: string;
 
-  constructor() {
-    // TODO: fetch from API
-    this.header = 'Team Details';
+  constructor(private route: ActivatedRoute, private teamService: TeamService) {
+    this.teamId = 0;
+    this.header = '';
     this.user = {
-      is_authenticated: true,
-      is_superuser: true
+      is_authenticated: false,
+      is_superuser: false
     }
+
     this.team = {
-      id: 1,
-      name: 'Mercedes',
-      date: new Date('2010-01-01'),
-      championships: 5,
-      points: 1000,
-      image: '',
-      teamleader: {
-        id: 1,
-        name: 'Toto Wolff',
-        image: ''
-      }
+      id: 0,
+      name: '',
+
     };
     this.pilots = [
       {
-        id: 1,
-        name: 'Lewis Hamilton',
-        date: new Date('1985-01-07'),
-        victories: 62,
-        pole_positions: 96,
-        podiums: 126,
-        championships: 5,
-        contract: 2022,
-        entry_year: 2007,
+        id: 0,
+        name: '',
         team: {
-          id: 1,
-          name: 'Mercedes',
-          date: new Date('2010-01-01'),
-          championships: 5,
-          points: 1000,
-          image: '',
-          teamleader: {
-            id: 1,
-            name: 'Toto Wolff',
-            image: ''
-          }
+          id: 0,
+          name: '',
         },
-        country: [
-          {
-            id: 1,
-            designation: 'United Kingdom',
-            code: 'GB'
-          }
-        ],
-        image: ''
       }
     ];
     this.isFavourite = true;
@@ -79,9 +51,26 @@ export class TeamComponent {
 
 
   ngOnInit() {
+    this.route.paramMap.subscribe(paramMap  => {
+      let id = paramMap.get('id');
+      if (id !== null) {
+        this.teamId = +id;
+      }
+      this.getTeam();
+    })
   }
 
   getTeam() {
+  this.teamService.getTeam(this.teamId).subscribe(data => {
+    console.log(data);
+    this.team = data.team;
+    this.team.teamleader = data.teamleader;
+    this.team.points = data.points.points;
+    this.header = data.header.header;
+    this.pilots = data.pilots;
+    this.user = data.auth;
+
+  });
   }
 
   addToFavourites() {

@@ -15,9 +15,9 @@ export class CircuitService {
   private baseURL = 'http://localhost:8000/ws/';
   constructor(private http: HttpClient) { }
 
-  getCircuit(id: number): Observable<Circuit> {
+  getCircuit(id: number): Observable<any> {
     const url = this.baseURL + "circuit?id=" + id;
-    return this.http.get<Circuit>(url);
+    return this.http.get<any>(url);
   }
 
   getCircuits(): Observable<Circuit[]> {

@@ -14,9 +14,9 @@ export class RaceService {
   private baseURL = 'http://localhost:8000/ws/';
   constructor(private http: HttpClient) { }
 
-  getRace(id: number): Observable<Race> {
+  getRace(id: number): Observable<any> {
     const url = this.baseURL + "race?id=" + id;
-    return this.http.get<Race>(url);
+    return this.http.get<any>(url);
   }
 
   getRaces(): Observable<Race[]> {
