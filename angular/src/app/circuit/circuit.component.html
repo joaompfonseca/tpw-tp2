@@ -12,7 +12,7 @@
 <p><b>Length: </b>{{ circuit.length }}</p>
 <p><b>Location: </b>{{ circuit.location }}</p>
 <p><b>Last Winner: </b><a routerLink="/pilots/{{circuit.last_winner.id}}">{{ circuit.last_winner.name }}</a></p>
-<p><b>Country: </b><a routerLink="/countries/{{circuit.country.id}}">{{ circuit.country.designation }}</a></p>
+<p><b>Country: </b><a routerLink="/countries/{{circuit.country.id}}">{{ circuit.country.designation }} ({{circuit.country.code}})</a></p>
 <ng-container *ngIf="races.length > 0">
   <p><b>Races: </b>
     <ng-container *ngFor="let r of races; let last=last">
