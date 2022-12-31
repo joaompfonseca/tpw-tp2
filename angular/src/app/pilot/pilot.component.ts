@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {User} from "../../interfaces/user";
 import {Pilot} from "../../interfaces/pilot";
 import {Result} from "../../interfaces/result";
+import {Race} from "../../interfaces/race";
 import {PilotService} from "../../services/pilot/pilot.service";
 import {ActivatedRoute} from "@angular/router";
 
@@ -43,7 +44,8 @@ export class PilotComponent implements OnInit {
         name: '',
         date: new Date(),
         championships: 0,
-        image: '',},
+        image: '',
+      },
       victories: 0,
       pole_positions: 0,
       podiums: 0,
@@ -51,7 +53,7 @@ export class PilotComponent implements OnInit {
       contract: 0,
       entry_year: 0,
       image: '',
-      }
+    }
     this.results = [];
     this.points = 0;
     this.isFavourite = true;
@@ -60,12 +62,12 @@ export class PilotComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.paramMap.subscribe(paramMap  => {
+    this.route.paramMap.subscribe(paramMap => {
       let id = paramMap.get('id');
-     if (id !== null) {
-       this.pilotId = +id;
-     }
-     this.getPilot();
+      if (id !== null) {
+        this.pilotId = +id;
+      }
+      this.getPilot();
     })
   }
 
@@ -74,7 +76,15 @@ export class PilotComponent implements OnInit {
       this.pilot = data.pilot;
       this.pilot.country = data.country;
       this.pilot.team = data.team;
+      this.pilot.points = data.points.points;
       this.results = data.results;
+      this.results.forEach(result => {
+        for (let race of data.races) {
+          if (result.race == race.id) {
+            result.race = race;
+          }
+        }
+      })
       this.points = data.points.points;
       this.user = data.auth;
       this.header = data.header.header;

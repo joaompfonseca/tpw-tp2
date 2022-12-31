@@ -34,7 +34,7 @@
     <p><b>Country(ies): </b>
       <ng-container *ngFor="let c of pilot.country; let last = last">
         <a routerLink="/countries/{{c.id}}">{{ c.designation }} ({{ c.code }})</a>
-        <span *ngIf="!last">,</span>
+        <span *ngIf="!last">, </span>
       </ng-container>
     </p>
   </div>

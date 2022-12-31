@@ -15,7 +15,7 @@
   <p><b>Circuits: </b>
     <ng-container *ngFor="let c of circuits; let last=last">
       <a routerLink="/circuits/{{c.id}}">{{ c.name }}</a>
-      <ng-container *ngIf="!last"> -</ng-container>
+      <span *ngIf="!last"> - </span>
     </ng-container>
   </p>
 </ng-container>
@@ -24,7 +24,7 @@
   <p><b>Pilots: </b>
     <ng-container *ngFor="let p of pilots; let last=last">
       <a routerLink="/pilots/{{p.id}}">{{ p.name }}</a>
-      <ng-container *ngIf="!last"> -</ng-container>
+      <span *ngIf="!last"> - </span>
     </ng-container>
   </p>
 </ng-container>
