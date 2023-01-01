@@ -86,4 +86,6 @@ urlpatterns = [
     # Team Favourites
     path('ws/teamfavadd', views.team_fav_add),
     path('ws/teamfavrem', views.team_fav_rem),
+    # Image
+    path('image/<str:type>/<int:_id>', views.get_image),
 ]

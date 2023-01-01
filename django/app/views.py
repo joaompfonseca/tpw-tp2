@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login, get_user, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import render, redirect
 from rest_framework import status, authentication, permissions, views, generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -807,3 +808,17 @@ def team_fav_rem(req):
     user_profile.favourite_team.remove(team)
     user_profile.save()
     return Response(status=status.HTTP_200_OK)
+
+
+def get_image(req, type, _id):
+    if type == 'pilot':
+        image = Pilot.objects.get(id=_id).image
+    elif type == 'team':
+        image = Team.objects.get(id=_id).image
+    elif type == 'teamleader':
+        image = TeamLeader.objects.get(id=_id).image
+    elif type == 'profile':
+        image = Profile.objects.get(user=req.user).profile_image
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    return HttpResponse(image, content_type='image/png')
