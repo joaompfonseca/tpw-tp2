@@ -13,52 +13,18 @@ import {CountryService} from "../../services/country/country.service";
 })
 export class CountryComponent implements OnInit {
 
-  header: string;
-  countryId: number;
-  user: User;
-  country: Country;
-  circuits: Circuit[];
-  pilots: Pilot[];
+  countryId: number | undefined;
 
-  constructor(private route: ActivatedRoute, private countryService: CountryService) {
-    this.header = '';
-    this.countryId = 0;
-    this.user = {
-      is_authenticated: false,
-      is_superuser: false,
-    };
-    this.country = {
-      id: 0,
-      designation: '',
-    };
-    this.circuits = [
-      {
-        id: 0,
-        name: '',
-        last_winner: {
-          id: 0,
-          name: '',
-          team: {
-            id: 0,
-            name: '',
-          }
-        },
-        country: {
-          id: 0,
-          designation: '',
-        }
-      }
-    ];
-    this.pilots = [
-      {
-        id: 0,
-        name: '',
-        team: {
-          id: 0,
-          name: '',
-        }
-      }
-    ];
+  header: string | undefined;
+  user: User | undefined;
+  country: Country | undefined;
+  circuits: Circuit[] | undefined;
+  pilots: Pilot[] | undefined;
+
+  constructor(
+    private route: ActivatedRoute,
+    private countryService: CountryService
+  ) {
   }
 
   ngOnInit() {
@@ -72,7 +38,7 @@ export class CountryComponent implements OnInit {
   }
 
   getCountry() {
-this.countryService.getCountry(this.countryId).subscribe(data => {
+    this.countryService.getCountry(this.countryId!).subscribe(data => {
       this.header = data.header.header;
       this.user = data.auth;
       this.country = data.country;

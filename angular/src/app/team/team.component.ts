@@ -12,46 +12,26 @@ import {TeamService} from "../../services/team/team.service";
 })
 export class TeamComponent {
 
-  header: string;
-  user: User;
-  team: Team;
-  pilots: Pilot[];
-  teamId: number;
-  isFavourite: boolean;
-  likeImage: string;
-  dislikeImage: string;
+  teamId: number | undefined;
 
-  constructor(private route: ActivatedRoute, private teamService: TeamService) {
-    this.teamId = 0;
-    this.header = '';
-    this.user = {
-      is_authenticated: false,
-      is_superuser: false
-    }
+  header: string | undefined;
+  user: User | undefined;
+  team: Team | undefined;
+  pilots: Pilot[] | undefined;
+  // TODO: Fetch API
+  isFavourite: boolean = false;
+  likeImage: string = '';
+  dislikeImage: string = '';
 
-    this.team = {
-      id: 0,
-      name: '',
-
-    };
-    this.pilots = [
-      {
-        id: 0,
-        name: '',
-        team: {
-          id: 0,
-          name: '',
-        },
-      }
-    ];
-    this.isFavourite = true;
-    this.likeImage = '';
-    this.dislikeImage = '';
+  constructor(
+    private route: ActivatedRoute,
+    private teamService: TeamService
+  ) {
   }
 
 
   ngOnInit() {
-    this.route.paramMap.subscribe(paramMap  => {
+    this.route.paramMap.subscribe(paramMap => {
       let id = paramMap.get('id');
       if (id !== null) {
         this.teamId = +id;
@@ -61,16 +41,16 @@ export class TeamComponent {
   }
 
   getTeam() {
-  this.teamService.getTeam(this.teamId).subscribe(data => {
-    console.log(data);
-    this.team = data.team;
-    this.team.teamleader = data.teamleader;
-    this.team.points = data.points.points;
-    this.header = data.header.header;
-    this.pilots = data.pilots;
-    this.user = data.auth;
+    this.teamService.getTeam(this.teamId!).subscribe(data => {
+      console.log(data);
+      this.team = data.team;
+      this.team!.teamleader = data.teamleader;
+      this.team!.points = data.points.points;
+      this.header = data.header.header;
+      this.pilots = data.pilots;
+      this.user = data.auth;
 
-  });
+    });
   }
 
   addToFavourites() {

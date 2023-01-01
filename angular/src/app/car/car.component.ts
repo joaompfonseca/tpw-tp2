@@ -11,32 +11,16 @@ import {ActivatedRoute} from "@angular/router";
 })
 export class CarComponent implements OnInit {
 
-  header: string;
-  carId: number;
-  user: User;
-  car: Car;
+  carId: number | undefined;
 
-  constructor(private route: ActivatedRoute,  private carService: CarService) {
-    this.header = '';
-    this.carId = 0;
-    this.user = {
-      is_authenticated: false,
-      is_superuser: false,
-    };
-    this.car = {
-      id: 0,
-      model: '',
-      engine: '',
-      weight: 0,
-      pilot: {
-        id: 0,
-        name: '',
-        team: {
-          id: 0,
-          name: '',
-        }
-      }
-    }
+  header: string | undefined;
+  user: User | undefined;
+  car: Car | undefined;
+
+  constructor(
+    private route: ActivatedRoute,
+    private carService: CarService
+  ) {
   }
 
   ngOnInit() {
@@ -50,13 +34,13 @@ export class CarComponent implements OnInit {
   }
 
   getCar() {
-    this.carService.getCar(this.carId).subscribe(data => {
+    this.carService.getCar(this.carId!).subscribe(data => {
       console.log(data);
       this.header = data.header.header;
       this.user = data.auth;
       this.car = data.car;
-      this.car.pilot = data.pilot;
-      this.car.pilot.team = data.team;
+      this.car!.pilot = data.pilot;
+      this.car!.pilot.team = data.team;
     });
   }
 }

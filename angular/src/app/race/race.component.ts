@@ -12,78 +12,21 @@ import {RaceService} from "../../services/race/race.service";
 })
 export class RaceComponent implements OnInit {
 
-  header: string
-  raceId: number;
-  user: User
-  race: Race
-  results: Result[]
+  raceId: number | undefined;
 
-  constructor(private route: ActivatedRoute, private raceService: RaceService) {
-    this.header = '';
-    this.raceId = 0;
-    this.user = {
-      is_authenticated: false,
-      is_superuser: false
-    };
-    this.race = {
-      id: 0,
-      name: '',
-      circuit: {
-        id: 0,
-        name: '',
-        last_winner: {
-          id: 0,
-          name: '',
-          team: {
-            id: 0,
-            name: '',
-          }
-        },
-        country: {
-          id: 0,
-          designation: '',
-        }
-      }
-    };
-    this.results = [
-      {
-        id: 0,
-        position: 0,
-        pilot: {
-          id: 0,
-          name: '',
-          team: {
-            id: 0,
-            name: '',
-          }
-        },
-        race: {
-          id: 0,
-          name: '',
-          circuit: {
-            id: 0,
-            name: '',
-            last_winner: {
-              id: 0,
-              name: '',
-              team: {
-                id: 0,
-                name: '',
-              }
-            },
-            country: {
-              id: 0,
-              designation: '',
-            }
-          }
-        },
-        points: 0
-      }
-    ]
+  header: string | undefined;
+  user: User | undefined;
+  race: Race | undefined;
+  results: Result[] | undefined;
+
+  constructor(
+    private route: ActivatedRoute,
+    private raceService: RaceService
+  ) {
   }
 
   ngOnInit() {
-    this.route.paramMap.subscribe(paramMap  => {
+    this.route.paramMap.subscribe(paramMap => {
       let id = paramMap.get('id');
       if (id !== null) {
         this.raceId = +id;
@@ -93,12 +36,11 @@ export class RaceComponent implements OnInit {
   }
 
   getRace() {
-    this.raceService.getRace(this.raceId).subscribe(data => {
-      console.log(data);
+    this.raceService.getRace(this.raceId!).subscribe(data => {
       this.header = data.header.header;
       this.race = data.race;
-      this.race.circuit = data.circuit;
-      this.race.fast_lap = data.race.fast_lap.substring(3);
+      this.race!.circuit = data.circuit;
+      this.race!.fast_lap = data.race.fast_lap.substring(3);
       this.user = data.auth;
       let results = data.results;
       let pilots = data.pilots;
@@ -106,7 +48,6 @@ export class RaceComponent implements OnInit {
         results[i].pilot = pilots[i].name;
       }
       this.results = data.results;
-
     })
   }
 }

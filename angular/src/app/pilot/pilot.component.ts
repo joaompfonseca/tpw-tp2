@@ -13,52 +13,22 @@ import {ActivatedRoute} from "@angular/router";
 })
 export class PilotComponent implements OnInit {
 
-  header: string;
-  user: User;
-  pilot: Pilot;
-  results: Result[];
-  points: number;
+  pilotId: number | undefined;
 
-  isFavourite: boolean;
-  likeImage: string;
-  dislikeImage: string;
-  pilotId: number;
+  header: string | undefined;
+  user: User | undefined;
+  pilot: Pilot | undefined;
+  results: Result[] | undefined;
+  points: number | undefined;
+  // TODO: Fetch API
+  isFavourite: boolean = false;
+  likeImage: string = '';
+  dislikeImage: string = '';
 
-  constructor(private route: ActivatedRoute, private pilotService: PilotService) {
-    this.header = '';
-    this.pilotId = 0;
-    this.user = {
-      is_authenticated: false,
-      is_superuser: false,
-    }
-    this.pilot = {
-      id: 0,
-      name: '',
-      country: [{
-        id: 0,
-        designation: '',
-        code: '',
-      }],
-      team: {
-        id: 0,
-        name: '',
-        date: new Date(),
-        championships: 0,
-        image: '',
-      },
-      victories: 0,
-      pole_positions: 0,
-      podiums: 0,
-      championships: 0,
-      contract: 0,
-      entry_year: 0,
-      image: '',
-    }
-    this.results = [];
-    this.points = 0;
-    this.isFavourite = true;
-    this.likeImage = '';
-    this.dislikeImage = '';
+  constructor(
+    private route: ActivatedRoute,
+    private pilotService: PilotService
+  ) {
   }
 
   ngOnInit() {
@@ -72,13 +42,13 @@ export class PilotComponent implements OnInit {
   }
 
   getPilot() {
-    this.pilotService.getPilot(this.pilotId).subscribe(data => {
+    this.pilotService.getPilot(this.pilotId!).subscribe(data => {
       this.pilot = data.pilot;
-      this.pilot.country = data.country;
-      this.pilot.team = data.team;
-      this.pilot.points = data.points.points;
+      this.pilot!.country = data.country;
+      this.pilot!.team = data.team;
+      this.pilot!.points = data.points.points;
       this.results = data.results;
-      this.results.forEach(result => {
+      this.results!.forEach(result => {
         for (let race of data.races) {
           if (result.race == race.id) {
             result.race = race;

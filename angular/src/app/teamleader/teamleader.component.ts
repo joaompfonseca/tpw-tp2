@@ -12,27 +12,16 @@ import {TeamLeaderService} from "../../services/teamleader/team-leader.service";
 })
 export class TeamleaderComponent implements OnInit {
 
-  header: string;
-  teamleaderId: number;
-  user: User;
-  teamleader: TeamLeader;
+  teamleaderId: number | undefined;
 
-  constructor(private route: ActivatedRoute, private teamleaderService: TeamLeaderService) {
-    this.header = '';
-    this.teamleaderId = 0;
-    this.user = {
-      is_authenticated: false,
-      is_superuser: false
-    }
-    this.teamleader = {
-      id: 0,
-      image: '',
-      name: '',
-      team: {
-        id: 0,
-        name: '',
-      }
-    };
+  header: string | undefined;
+  user: User | undefined;
+  teamleader: TeamLeader | undefined;
+
+  constructor(
+    private route: ActivatedRoute,
+    private teamleaderService: TeamLeaderService
+  ) {
   }
 
 
@@ -47,13 +36,12 @@ export class TeamleaderComponent implements OnInit {
   }
 
   getTeamleader() {
-this.teamleaderService.getTeamLeader(this.teamleaderId).subscribe(data => {
+    this.teamleaderService.getTeamLeader(this.teamleaderId!).subscribe(data => {
       console.log(data);
       this.header = data.header.header;
       this.user = data.auth;
       this.teamleader = data.teamleader;
-      this.teamleader.team = data.team;
+      this.teamleader!.team = data.team;
     });
-
   }
 }

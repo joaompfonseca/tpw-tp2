@@ -12,57 +12,17 @@ import {CircuitService} from "../../services/circuit/circuit.service";
 })
 export class CircuitComponent implements OnInit {
 
-  header: string;
-  circuitId: number;
-  user: User;
-  circuit: Circuit;
-  races: Race[];
+  circuitId: number | undefined;
 
-  constructor(private route: ActivatedRoute, private circuitService: CircuitService) {
-    this.header = '';
-    this.circuitId = 0;
-    this.user = {
-      is_authenticated: false,
-      is_superuser: false,
-    };
-    this.circuit = {
-      id: 0,
-      name: '',
-      last_winner: {
-        id: 0,
-        name: '',
-        team: {
-          id: 0,
-          name: '',
-        }
-      },
-      country: {
-        id: 0,
-        designation: ''
-      }
-    };
-    this.races = [
-      {
-        id: 0,
-        name: '',
-        circuit: {
-          id: 0,
-          name: '',
-          last_winner: {
-            id: 0,
-            name: '',
-            team: {
-              id: 0,
-              name: '',
-            }
-          },
-          country: {
-            id: 0,
-            designation: '',
-          }
-        }
-      }
-    ]
+  header: string | undefined;
+  user: User | undefined;
+  circuit: Circuit | undefined;
+  races: Race[] | undefined;
+
+  constructor(
+    private route: ActivatedRoute,
+    private circuitService: CircuitService
+  ) {
   }
 
   ngOnInit() {
@@ -76,13 +36,13 @@ export class CircuitComponent implements OnInit {
   }
 
   getCircuit() {
-    this.circuitService.getCircuit(this.circuitId).subscribe(data => {
+    this.circuitService.getCircuit(this.circuitId!).subscribe(data => {
       console.log(data);
       this.header = data.header.header;
       this.user = data.auth;
       this.circuit = data.circuit;
-      this.circuit.country = data.country;
-      this.circuit.last_winner = data.last_winner;
+      this.circuit!.country = data.country;
+      this.circuit!.last_winner = data.last_winner;
       this.races = data.races;
 
     })
