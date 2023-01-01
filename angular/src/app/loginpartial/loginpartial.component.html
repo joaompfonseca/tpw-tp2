@@ -1,7 +1,7 @@
 <li *ngIf="user && user.is_authenticated; else default">
   <a routerLink="/profile">
     Hello <strong>{{ user.username }}</strong> !
-    <!--<img src="images/{{ image }}">-->
+    <img [src]="user.image">
   </a>
 </li>
 

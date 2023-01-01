@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {User} from "../../interfaces/user";
 import {ActivatedRoute} from "@angular/router";
 import {UserService} from "../../services/user/user.service";
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-loginpartial',
@@ -14,6 +15,7 @@ export class LoginpartialComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private userService: UserService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit() {
@@ -21,6 +23,15 @@ export class LoginpartialComponent implements OnInit {
   }
 
   getUser() {
-    this.userService.getUser().subscribe(user => this.user = user);
+    this.userService.getUser().subscribe(user => {
+      this.user = user
+      this.getUserImage();
+    });
+  }
+
+  getUserImage() {
+    this.userService.getUserImage().subscribe(image => {
+      this.user!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+    });
   }
 }
