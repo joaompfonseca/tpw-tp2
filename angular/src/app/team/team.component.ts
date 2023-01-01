@@ -4,6 +4,7 @@ import {Team} from "../../interfaces/team";
 import {Pilot} from "../../interfaces/pilot";
 import {ActivatedRoute} from "@angular/router";
 import {TeamService} from "../../services/team/team.service";
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-team',
@@ -25,7 +26,8 @@ export class TeamComponent {
 
   constructor(
     private route: ActivatedRoute,
-    private teamService: TeamService
+    private teamService: TeamService,
+    private sanitizer: DomSanitizer
   ) {
   }
 
@@ -42,15 +44,21 @@ export class TeamComponent {
 
   getTeam() {
     this.teamService.getTeam(this.teamId!).subscribe(data => {
-      console.log(data);
       this.team = data.team;
       this.team!.teamleader = data.teamleader;
       this.team!.points = data.points.points;
       this.header = data.header.header;
       this.pilots = data.pilots;
       this.user = data.auth;
-
+      this.getTeamImage();
     });
+  }
+
+  getTeamImage() {
+    this.teamService.getTeamImage(this.teamId!).subscribe(
+      image => {
+        this.team!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+      });
   }
 
   addToFavourites() {

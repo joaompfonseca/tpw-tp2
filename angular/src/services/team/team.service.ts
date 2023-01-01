@@ -21,6 +21,11 @@ export class TeamService {
     return this.http.get<any>(url);
   }
 
+  getTeamImage(id: number): Observable<Blob> {
+    const url = this.baseURL + "image/team/" + id;
+    return this.http.get(url, {responseType: 'blob'});
+  }
+
   getTeams(): Observable<Team[]> {
     const url = this.baseURL + "teams";
     return this.http.get<Team[]>(url);

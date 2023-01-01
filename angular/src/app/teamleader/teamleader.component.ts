@@ -3,6 +3,7 @@ import {TeamLeader} from "../../interfaces/teamleader";
 import {User} from "../../interfaces/user";
 import {ActivatedRoute} from "@angular/router";
 import {TeamLeaderService} from "../../services/teamleader/team-leader.service";
+import {DomSanitizer} from "@angular/platform-browser";
 
 
 @Component({
@@ -20,7 +21,8 @@ export class TeamleaderComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private teamleaderService: TeamLeaderService
+    private teamleaderService: TeamLeaderService,
+    private sanitizer: DomSanitizer
   ) {
   }
 
@@ -36,12 +38,19 @@ export class TeamleaderComponent implements OnInit {
   }
 
   getTeamleader() {
-    this.teamleaderService.getTeamLeader(this.teamleaderId!).subscribe(data => {
-      console.log(data);
+    this.teamleaderService.getTeamleader(this.teamleaderId!).subscribe(data => {
       this.header = data.header.header;
       this.user = data.auth;
       this.teamleader = data.teamleader;
       this.teamleader!.team = data.team;
+      this.getTeamleaderImage();
     });
+  }
+
+  getTeamleaderImage() {
+    this.teamleaderService.getTeamleaderImage(this.teamleaderId!).subscribe(
+      image => {
+        this.teamleader!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+      });
   }
 }

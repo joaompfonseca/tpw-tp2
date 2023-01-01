@@ -5,6 +5,7 @@ import {Result} from "../../interfaces/result";
 import {Race} from "../../interfaces/race";
 import {PilotService} from "../../services/pilot/pilot.service";
 import {ActivatedRoute} from "@angular/router";
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-pilot',
@@ -27,7 +28,8 @@ export class PilotComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private pilotService: PilotService
+    private pilotService: PilotService,
+    private sanitizer: DomSanitizer
   ) {
   }
 
@@ -58,7 +60,15 @@ export class PilotComponent implements OnInit {
       this.points = data.points.points;
       this.user = data.auth;
       this.header = data.header.header;
+      this.getPilotImage();
     });
+  }
+
+  getPilotImage() {
+    this.pilotService.getPilotImage(this.pilotId!).subscribe(
+      image => {
+        this.pilot!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+      });
   }
 
   addToFavourites() {

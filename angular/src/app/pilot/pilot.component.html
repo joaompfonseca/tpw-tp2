@@ -1,4 +1,4 @@
-<div *ngIf="header && user && pilot && results && points; else loader">
+<div *ngIf="header && user && pilot && pilot.image && results && points; else loader">
   <div class="row">
     <h2>{{ header }}</h2>
     <div *ngIf="user.is_authenticated">

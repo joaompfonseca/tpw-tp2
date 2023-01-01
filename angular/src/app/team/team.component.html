@@ -1,4 +1,4 @@
-<div *ngIf="header && user && team && pilots; else loader">
+<div *ngIf="header && user && team && team.image && pilots; else loader">
   <div class="row">
     <h2>{{ header }}</h2>
     <div *ngIf="user.is_authenticated">
@@ -18,7 +18,7 @@
     <a routerLink="/teams/{{team.id}}/edit">Edit Team</a>
   </p>
 
-  <img class="rounded float-right" src="{{ team.image }}" alt="Team Image"
+  <img class="rounded float-right" [src]="team.image" alt="Team Image"
        style="float:right; width:320px; height:180px">
 
   <p><b>Name: </b>{{ team.name }}</p>

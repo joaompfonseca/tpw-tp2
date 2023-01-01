@@ -29,7 +29,7 @@ export class ListComponent implements OnInit {
               private circuitService: CircuitService,
               private carService: CarService,
               private countryService: CountryService,
-              private teamLeaderService: TeamLeaderService) {
+              private teamleaderService: TeamLeaderService) {
     this.header = '';
     this.type = '';
     this.actions = [
@@ -95,7 +95,7 @@ export class ListComponent implements OnInit {
           {url: '/teamleaders/search', str: 'Search Team Leader'},
           {url: '/teamleaders/new', str: 'New Team Leader'}
         ];
-        this.getTeamLeaders();
+        this.getTeamleaders();
         break;
 
   }
@@ -154,10 +154,10 @@ export class ListComponent implements OnInit {
     );
     }
 
-    getTeamLeaders() {
-    this.teamLeaderService.getTeamLeaders().subscribe( teamLeaders => {
-      this.list = teamLeaders.map((teamLeader) => {
-        return [{url: '/teamleaders/' + teamLeader.id, str: teamLeader.name}];
+    getTeamleaders() {
+    this.teamleaderService.getTeamleaders().subscribe( teamleaders => {
+      this.list = teamleaders.map((teamleader) => {
+        return [{url: '/teamleaders/' + teamleader.id, str: teamleader.name}];
       });
     }
     );

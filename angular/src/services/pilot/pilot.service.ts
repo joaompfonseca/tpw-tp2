@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Pilot} from "../../interfaces/pilot"
 import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {DomSanitizer} from "@angular/platform-browser";
 
 
 const httpOptions = {
@@ -13,12 +14,19 @@ const httpOptions = {
 })
 export class PilotService {
   private baseURL = 'http://localhost:8000/ws/';
-  constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient) {
+  }
 
   getPilot(id: number): Observable<any> {
     const url = this.baseURL + "pilot?id=" + id;
     let pilot: Observable<any> = this.http.get<any>(url);
     return pilot;
+  }
+
+  getPilotImage(id: number): Observable<Blob> {
+    const url = this.baseURL + "image/pilot/" + id;
+    return this.http.get(url, {responseType: 'blob'});
   }
 
   getPilots(): Observable<Pilot[]> {
@@ -37,7 +45,7 @@ export class PilotService {
     return this.http.get<Pilot[]>(url);
   }
 
-  updatePilot(id: number, pilot: Pilot): Observable<any>{
+  updatePilot(id: number, pilot: Pilot): Observable<any> {
     const url = this.baseURL + "pilotupdate?id=" + id;
     return this.http.put(url, pilot, httpOptions);
   }

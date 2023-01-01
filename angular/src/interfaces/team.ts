@@ -1,4 +1,5 @@
 import {TeamLeader} from "./teamleader";
+import {SafeUrl} from "@angular/platform-browser";
 
 export interface Team {
   id: number
@@ -6,6 +7,6 @@ export interface Team {
   date?: Date
   championships?: number
   points?: number
-  image?: string
+  image?: SafeUrl
   teamleader?: TeamLeader
 }

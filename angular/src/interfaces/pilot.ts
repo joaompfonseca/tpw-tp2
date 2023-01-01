@@ -1,5 +1,6 @@
 import {Team} from "./team";
 import {Country} from "./country";
+import {SafeUrl} from "@angular/platform-browser";
 
 export interface Pilot {
   id: number
@@ -14,5 +15,5 @@ export interface Pilot {
   entry_year?: number
   team: Team
   country?: Country[]
-  image?: string
+  image?: SafeUrl
 }

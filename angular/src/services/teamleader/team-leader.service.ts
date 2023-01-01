@@ -16,12 +16,17 @@ export class TeamLeaderService {
   private baseURL = 'http://localhost:8000/ws/';
   constructor(private http: HttpClient) { }
 
-  getTeamLeader(id: number): Observable<any> {
+  getTeamleader(id: number): Observable<any> {
     const url = this.baseURL + "teamleader?id=" + id;
     return this.http.get<any>(url);
   }
 
-  getTeamLeaders(): Observable<TeamLeader[]> {
+  getTeamleaderImage(id: number): Observable<Blob> {
+    const url = this.baseURL + "image/teamleader/" + id;
+    return this.http.get(url, {responseType: 'blob'});
+  }
+
+  getTeamleaders(): Observable<TeamLeader[]> {
     const url = this.baseURL + "teamleaders";
     return this.http.get<TeamLeader[]>(url);
   }
