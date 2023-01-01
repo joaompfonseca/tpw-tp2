@@ -1,11 +1,11 @@
-import {Pilot} from "./pilot";
-import {Team} from "./team";
 import {User} from "./user";
+import {SafeUrl} from "@angular/platform-browser";
 
 export interface Profile {
-  id: number
-  user: User
-  profile_image: string
-  favourite_pilot: Pilot[]
-  favourite_team: Team[]
+  id: number;
+  user: User;
+  image?: SafeUrl;
+  biography: string;
+  favourite_pilot: {id: number, name: string, image?: SafeUrl}[];
+  favourite_team: {id: number, name: string, image?: SafeUrl}[];
 }

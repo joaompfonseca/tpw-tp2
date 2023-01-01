@@ -746,9 +746,24 @@ def teamleader_update(req):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile_get(req):
+    # User
+    user_s = UserSerializer(req.user)
+    # Profile
     profile = Profile.objects.get(user=req.user)
-    t = ProfileSerializer(profile)
-    return Response(t.data)
+    profile_s = ProfileSerializer({
+        'id': profile.id,
+        'user': user_s.data,
+        'biography': profile.biography,
+        'favourite_pilot': SimplePilotSerializer(
+            [{'id': pilot.id, 'name': pilot.name}
+             for pilot in profile.favourite_pilot.all()],
+            many=True).data,
+        'favourite_team': SimpleTeamSerializer(
+            [{'id': team.id, 'name': team.name}
+             for team in profile.favourite_team.all()],
+            many=True).data
+    })
+    return Response(profile_s.data)
 
 
 @api_view(['PUT'])
