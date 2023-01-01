@@ -12,12 +12,17 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(): Observable<User> {
-    const url = this.baseURL + "user";
+    const url = this.baseURL + 'user';
     return this.http.get<User>(url, {withCredentials: true});
   }
 
   login(username: string, password: string): Observable<User> {
-    const url = this.baseURL + "login";
+    const url = this.baseURL + 'login';
     return this.http.post<User>(url, {username: username, password: password}, {withCredentials: true});
+  }
+
+  logout(): Observable<any> {
+    const url = this.baseURL + 'logout';
+    return this.http.get(url, {withCredentials: true});
   }
 }

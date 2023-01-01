@@ -4,6 +4,8 @@ import {PilotService} from "../../services/pilot/pilot.service";
 import {DomSanitizer} from "@angular/platform-browser";
 import {ProfileService} from "../../services/profile/profile.service";
 import {TeamService} from "../../services/team/team.service";
+import {UserService} from "../../services/user/user.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-profile',
@@ -18,6 +20,8 @@ export class ProfileComponent implements OnInit {
     private profileService: ProfileService,
     private pilotService: PilotService,
     private teamService: TeamService,
+    private userService: UserService,
+    private router: Router,
     private sanitizer: DomSanitizer
   ) {
   }
@@ -57,5 +61,11 @@ export class ProfileComponent implements OnInit {
           t.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
         });
     }
+  }
+
+  logout() {
+    this.userService.logout().subscribe(() => {
+      this.router.navigate(['/']).then(() => window.location.reload());
+    });
   }
 }
