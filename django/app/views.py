@@ -810,7 +810,7 @@ def team_fav_rem(req):
     return Response(status=status.HTTP_200_OK)
 
 
-def get_image(req, type, _id):
+def get_image(req, type, _id=None):
     if type == 'pilot':
         image = Pilot.objects.get(id=_id).image
     elif type == 'team':

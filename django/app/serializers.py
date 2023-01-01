@@ -21,10 +21,12 @@ class HomeSerializer(serializers.Serializer):
     teams_leaderboard = LeaderboardSerializer(many=True)
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email')
+class UserSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    is_authenticated = serializers.BooleanField()
+    is_superuser = serializers.BooleanField()
 
 
 class LoginSerializer(serializers.Serializer):
