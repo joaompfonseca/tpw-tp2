@@ -45,7 +45,10 @@ export class RaceComponent implements OnInit {
       let results = data.results;
       let pilots = data.pilots;
       for (let i = 0; i < results.length; i++) {
-        results[i].pilot = pilots[i].name;
+        results[i].pilot = {
+          'id': pilots[i].id,
+          'name': pilots[i].name
+        };
       }
       this.results = data.results;
     })
