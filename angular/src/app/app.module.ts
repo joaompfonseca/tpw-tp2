@@ -20,7 +20,7 @@ import { TeamComponent } from './team/team.component';
 import { TeamleaderComponent } from './teamleader/teamleader.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import {HttpClientModule} from '@angular/common/http';
+import {HttpClientModule, HttpClientXsrfModule} from '@angular/common/http';
 import {FormsModule} from "@angular/forms";
 
 @NgModule({
@@ -47,6 +47,7 @@ import {FormsModule} from "@angular/forms";
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    HttpClientXsrfModule,
     FormsModule,
   ],
   providers: [],

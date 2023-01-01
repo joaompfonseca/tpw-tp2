@@ -13,11 +13,11 @@ export class UserService {
 
   getUser(): Observable<User> {
     const url = this.baseURL + "user";
-    return this.http.get<User>(url);
+    return this.http.get<User>(url, {withCredentials: true});
   }
 
   login(username: string, password: string): Observable<User> {
     const url = this.baseURL + "login";
-    return this.http.post<User>(url, {username: username, password: password});
+    return this.http.post<User>(url, {username: username, password: password}, {withCredentials: true});
   }
 }

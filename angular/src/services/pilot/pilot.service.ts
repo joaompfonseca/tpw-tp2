@@ -2,11 +2,11 @@ import {Injectable} from '@angular/core';
 import {Pilot} from "../../interfaces/pilot"
 import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {DomSanitizer} from "@angular/platform-browser";
 
 
 const httpOptions = {
-  headers: new HttpHeaders({'Content-Type': 'application/json'})
+  headers: new HttpHeaders({'Content-Type': 'application/json'}),
+  withCredentials: true
 };
 
 @Injectable({
