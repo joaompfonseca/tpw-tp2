@@ -20,14 +20,13 @@ export class LoginComponent {
   ) {
   }
 
-
   login() {
     this.emptyFields = (this.username == '' || this.password == '');
     this.errors = false;
 
     if (!this.emptyFields) {
       this.userService.login(this.username, this.password).subscribe(
-        () => this.router.navigate(['/']),
+        () => this.router.navigate(['/']).then(() => window.location.reload()),
         () => this.errors = true
       );
     }

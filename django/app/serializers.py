@@ -24,6 +24,8 @@ class HomeSerializer(serializers.Serializer):
 class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
     email = serializers.EmailField()
     is_authenticated = serializers.BooleanField()
     is_superuser = serializers.BooleanField()
@@ -66,6 +68,11 @@ class PilotSerializer(serializers.ModelSerializer):
             'country', 'image')
 
 
+class SimplePilotSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
@@ -96,10 +103,17 @@ class TeamLeaderSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'team', 'image')
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ('user', 'profile_image', 'biography', 'favourit_pilot', 'favourit_team')
+class SimpleTeamSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
+class ProfileSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    user = UserSerializer()
+    biography = serializers.CharField()
+    favourite_pilot = SimplePilotSerializer(many=True)
+    favourite_team = SimpleTeamSerializer(many=True)
 
 
 class FavSerializer(serializers.Serializer):

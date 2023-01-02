@@ -21,7 +21,6 @@ const routes = [
   {path: '', component: HomeComponent},
   // Auth
   {path: 'login', component: LoginComponent},
-  {path: 'logout', component: HomeComponent},
   {path: 'signup', component: SignupComponent},
   // Car
   {path: 'cars', component: ListComponent, data: {type: 'car'}},
