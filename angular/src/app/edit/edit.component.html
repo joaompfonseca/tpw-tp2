@@ -1,3 +1,148 @@
+<div *ngIf="header && type">
+  <h2>{{ header }}</h2>
+  <br>
+
+  <div *ngIf="type === 'pilot'">
+    <p><label>Name:
+      <input [(ngModel)]="pilot!.name" placeholder="Name">
+    </label></p>
+    <p><label>Birth Data:
+      <input [(ngModel)]="pilot!.date" placeholder="Birth Data">
+    </label></p>
+    <p><label>Victories:
+      <input [(ngModel)]="pilot!.victories" placeholder="Victories">
+    </label></p>
+    <p><label>Poles Positions:
+      <input [(ngModel)]="pilot!.pole_positions" placeholder="poles">
+    </label></p>
+    <p><label>Championships:
+      <input [(ngModel)]="pilot!.championships" placeholder="Championships">
+    </label></p>
+    <p><label>Contract:
+      <input [(ngModel)]="pilot!.contract" placeholder="Contract">
+    </label></p>
+    <p><label>Entry Year:
+      <input [(ngModel)]="pilot!.entry_year" placeholder="Entry Year">
+    </label></p>
+    <p><label>Team:
+      <select [(ngModel)]="selectedTeamP" >
+        <option *ngFor="let team of Teams" [ngValue]="team" >{{ team.name }}</option>
+        <option [ngValue]="pilot!.team" selected>{{pilot!.team.name}}</option>
+      </select>
+    </label></p>
+    <p><label>Team Country(ies):
+      <select [(ngModel)]="selectedCountryP" multiple>
+        <option *ngFor="let country of Countries" [ngValue]="country" >{{ country.designation }}</option>
+        <option *ngFor="let co of pilot!.country" [ngValue]="co" selected>{{co.designation}}</option>
+      </select>
+    </label></p>
+    <button (click)="updatePilot()">Update</button>
+  </div>
+
+  <div *ngIf="type === 'team'">
+    <p><label>Name:
+      <input [(ngModel)]="team!.name" placeholder="Name">
+    </label></p>
+    <p><label>Foundation Date:
+      <input [(ngModel)]="team!.date" placeholder="Foundation Date">
+    </label></p>
+    <p><label>Championships:
+      <input [(ngModel)]="team!.championships" placeholder="Championships">
+    </label></p>
+    <button (click)="updateTeam()">Update</button>
+  </div>
+
+  <div *ngIf="type === 'race'">
+    <p><label>Name:
+      <input [(ngModel)]="race!.name" placeholder="Name">
+    </label></p>
+    <p><label>Date:
+      <input [(ngModel)]="race!.date" placeholder="Date">
+    </label></p>
+    <p><label>Season:
+      <input [(ngModel)]="race!.season" placeholder="Season">
+    </label></p>
+    <p><label>Fast Lap:
+      <input [(ngModel)]="race!.fast_lap" placeholder="Fast Lap">
+    </label></p>
+    <p><label>Circuit
+      <select [(ngModel)]="selectedCircuitR" >
+        <option *ngFor="let circuit of Circuits" [ngValue]="circuit" >{{ circuit.name }}</option>
+        <option [ngValue]="race!.circuit" selected>{{race!.circuit.name}}</option>
+      </select>
+    </label></p>
+    <button (click)="updateRace()">Update</button>
+  </div>
+
+  <div *ngIf="type === 'circuit'">
+    <p><label>Name:
+      <input [(ngModel)]="circuit!.name" placeholder="Name">
+    </label></p>
+    <p><label>Length:
+      <input [(ngModel)]="circuit!.length" placeholder="Length">
+    </label></p>
+    <p><label>Location:
+      <input [(ngModel)]="circuit!.location" placeholder="Location">
+    </label></p>
+    <p><label>Last Winner:
+      <select [(ngModel)]="selectedPilotC" >
+        <option *ngFor="let pilot of Pilots" [ngValue]="pilot" >{{ pilot.name }}</option>
+        <option [ngValue]="circuit!.last_winner" selected>{{circuit!.last_winner.name}}</option>
+      </select>
+    </label></p>
+    <p><label>Country:
+      <select [(ngModel)]="selectedCountryC" >
+        <option *ngFor="let country of Countries" [ngValue]="country" >{{ country.designation }}</option>
+        <option [ngValue]="circuit!.country" selected>{{circuit!.country.designation}}</option>
+      </select>
+    </label></p>
+    <button (click)="updateCircuit()">Update</button>
+  </div>
+
+  <div *ngIf="type === 'car'">
+    <p><label>Model:
+      <input [(ngModel)]="car!.model" placeholder="Model">
+    </label></p>
+    <p><label>Engine:
+      <input [(ngModel)]="car!.engine" placeholder="Engine">
+    </label></p>
+    <p><label>Weight:
+      <input [(ngModel)]="car!.weight" placeholder="Weight">
+    </label></p>
+    <p><label>Pilot:
+      <select [(ngModel)]="selectedPilotCar" >
+        <option *ngFor="let pilot of Pilots" [ngValue]="pilot" >{{ pilot.name }}</option>
+        <option [ngValue]="car!.pilot" selected>{{car!.pilot.name}}</option>
+      </select>
+    </label></p>
+    <button (click)="updateCar()">Update</button>
+  </div>
+
+  <div *ngIf="type === 'country'">
+    <p><label>Designation:
+      <input [(ngModel)]="country!.designation" placeholder="Designation">
+    </label></p>
+    <p><label>Code:
+      <input [(ngModel)]="country!.code" placeholder="Code">
+    </label></p>
+    <button (click)="updateCountry()">Update</button>
+  </div>
+
+  <div *ngIf="type === 'teamleader'">
+    <p><label>Name:
+      <input [(ngModel)]="teamleader!.name" placeholder="Nmae">
+    </label></p>
+    <p><label>Team:
+      <select [(ngModel)]="selectedTeamTL" >
+        <option *ngFor="let team of Teams" [ngValue]="team" >{{ team.name }}</option>
+        <option [ngValue]="teamleader!.team" selected>{{teamleader!.team!.name}}</option>
+      </select>
+    </label></p>
+    <button (click)="updateTeamLeader()">Update</button>
+  </div>
+
+</div>
+
 <!--
 <h2>{{ header }}</h2>
 <br>
