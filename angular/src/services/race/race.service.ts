@@ -25,7 +25,7 @@ export class RaceService {
     return this.http.get<Race[]>(url);
   }
 
-  createRace(race: Race): Observable<any> {
+  createRace(race: any): Observable<any> {
     const url = this.baseURL + "racecreate";
     return this.http.post(url, race, httpOptions)
   }
@@ -35,7 +35,7 @@ export class RaceService {
     return this.http.get<Race[]>(url);
   }
 
-  updateRace(id: number, race: Race): Observable<any>{
+  updateRace(id: number, race: any): Observable<any>{
     const url = this.baseURL + "raceupdate?id=" + id;
     return this.http.put(url, race, httpOptions);
   }

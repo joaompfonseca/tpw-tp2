@@ -35,7 +35,7 @@ export class PilotService {
     return pilots;
   }
 
-  createPilot(pilot: Pilot): Observable<any> {
+  createPilot(pilot: any): Observable<any> {
     const url = this.baseURL + "pilotcreate";
     return this.http.post(url, pilot, httpOptions)
   }
@@ -45,7 +45,7 @@ export class PilotService {
     return this.http.get<Pilot[]>(url);
   }
 
-  updatePilot(id: number, pilot: Pilot): Observable<any> {
+  updatePilot(id: number, pilot: any): Observable<any> {
     const url = this.baseURL + "pilotupdate?id=" + id;
     return this.http.put(url, pilot, httpOptions);
   }

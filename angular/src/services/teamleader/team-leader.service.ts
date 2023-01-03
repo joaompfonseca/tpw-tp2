@@ -6,7 +6,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 
 
 const httpOptions = {
-  headers: new HttpHeaders({'Content-Type': 'application/json'}),
+  headers: new HttpHeaders({'Content-Type': 'application/json','X-CSRFToken': 'aP9qIM0VOffwZmznMsPhoYuU5tAfYUJVTvCZWjROyVuJ6WheSFHL1HyW25MOvwcp'}),
   withCredentials: true
 };
 
@@ -32,7 +32,7 @@ export class TeamLeaderService {
     return this.http.get<TeamLeader[]>(url);
   }
 
-  createTeamLeader(teamleader: TeamLeader): Observable<any> {
+  createTeamLeader(teamleader: any): Observable<any> {
     const url = this.baseURL + "teamleadercreate";
     return this.http.post(url, teamleader, httpOptions)
   }
@@ -42,7 +42,7 @@ export class TeamLeaderService {
     return this.http.get<TeamLeader[]>(url);
   }
 
-  updateTeamLeader(id: number, teamleader: TeamLeader): Observable<any>{
+  updateTeamLeader(id: number, teamleader: any): Observable<any>{
     const url = this.baseURL + "teamleaderupdate?id=" + id;
     return this.http.put(url, teamleader, httpOptions);
   }

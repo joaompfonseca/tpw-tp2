@@ -42,7 +42,7 @@ export class TeamService {
     return this.http.get<Team[]>(url);
   }
 
-  updateTeam(id: number, team: Team): Observable<any>{
+  updateTeam(id: number, team: any): Observable<any>{
     const url = this.baseURL + "teamupdate?id=" + id;
     return this.http.put(url, team, httpOptions);
   }

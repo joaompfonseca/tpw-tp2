@@ -26,7 +26,7 @@ export class CircuitService {
     return this.http.get<Circuit[]>(url);
   }
 
-  createCircuit(circuit: Circuit): Observable<any> {
+  createCircuit(circuit: any): Observable<any> {
     const url = this.baseURL + "circuitcreate";
     return this.http.post(url, circuit, httpOptions)
   }
@@ -36,7 +36,7 @@ export class CircuitService {
     return this.http.get<Circuit[]>(url);
     }
 
-  updateCircuit(id: number, circuit: Circuit): Observable<any>{
+  updateCircuit(id: number, circuit: any): Observable<any>{
     const url = this.baseURL + "circuitupdate?id=" + id;
     return this.http.put(url, circuit, httpOptions);
   }

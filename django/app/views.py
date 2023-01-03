@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, get_user, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from rest_framework import status, authentication, permissions, views, generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -588,7 +588,7 @@ def team_get(req):
         pilots = Pilot.objects.filter(team=team)
         is_authenticated = IsAuthenticated()
         is_superuser = IsAdminUser()
-        teamleader = team.teamleader
+        teamleader = TeamLeader.objects.filter(team=team)
 
         points = 0
         for pilot in pilots:
@@ -599,7 +599,7 @@ def team_get(req):
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = TeamSerializer(team)
     serializer1 = PilotSerializer(pilots, many=True)
-    serializer3 = TeamLeaderSerializer(teamleader)
+    serializer3 = TeamLeaderSerializer(teamleader, many=True)
     points = PointsSerializer({'points': points})
     header = HeaderSerializer({'header': 'Team Details'})
     auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
@@ -828,12 +828,18 @@ def team_fav_rem(req):
 def get_image(req, type, _id=None):
     if type == 'pilot':
         image = Pilot.objects.get(id=_id).image
+        if image == '':
+            return HttpResponse("<html></html>")
     elif type == 'team':
         image = Team.objects.get(id=_id).image
+        if image == '':
+            return HttpResponse("<html></html>")
     elif type == 'teamleader':
         image = TeamLeader.objects.get(id=_id).image
+        if image == '':
+            return HttpResponse("<html></html>")
     elif type == 'profile':
         image = Profile.objects.get(user=req.user).profile_image
     else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return HttpResponseNotFound()
     return HttpResponse(image, content_type='image/png')

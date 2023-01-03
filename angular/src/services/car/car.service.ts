@@ -26,7 +26,7 @@ export class CarService {
     return this.http.get<Car[]>(url);
   }
 
-  createCar(car: Car): Observable<any> {
+  createCar(car: any): Observable<any> {
     const url = this.baseURL + "carcreate";
     return this.http.post(url, car, httpOptions)
   }
@@ -50,7 +50,7 @@ export class CarService {
     return this.http.get<Car[]>(url);
   }
 
-  updateCar(id: number, car: Car): Observable<any>{
+  updateCar(id: number, car: any): Observable<any>{
     const url = this.baseURL + "carupdate?id=" + id;
     return this.http.put(url, car, httpOptions);
   }
