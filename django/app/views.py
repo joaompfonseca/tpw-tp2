@@ -425,7 +425,7 @@ def pilot_search(req):
     else:
         req.session['searched'] = dict()
         # make query
-        pilots = Pilot.objects.filter(nameicontains=name)
+        pilots = Pilot.objects.filter(name__icontains=name)
         serializer = PilotSerializer(pilots, many=True)
         req.session['searched'][query] = serializer.data
     return Response(req.session['searched'][query])

@@ -1,29 +1,63 @@
-<!--
 <h2>{{ header }}</h2>
 <br>
 
 <div class="gaming-library">
   <div class="col-lg-12">
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="ui-widget">
-        <div class="form-group row">
-          <ng-container *ngFor="let field of form.controls">
-            <p>
-              {{ field.label }}
-              <input [formControlName]="field.controlName" type="text" id="{{ field.controlName }}"
-                     [matAutocomplete]="auto" [matAutocompleteConnectedTo]="field.controlName">
-              <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let op of options" [value]="op.name">
-                  {{ op.name }}
-                </mat-option>
-              </mat-autocomplete>
-            </p>
-            <br>
-          </ng-container>
+    <div *ngIf="type === 'pilot'">
+      <p><label>Name:
+        <input [(ngModel)]="pilot" placeholder="Name">
+      </label></p>
+      <button (click)="search_pilot()">Search</button>
+    </div>
+    <div *ngIf="type === 'team'">
+      <p><label>Name:
+        <input [(ngModel)]="team" placeholder="Name">
+      </label></p>
+      <button (click)="search_team()">Search</button>
+    </div>
+    <div *ngIf="type === 'race'">
+      <p><label>Name:
+        <input [(ngModel)]="race" placeholder="Name">
+      </label></p>
+      <button (click)="search_race()">Search</button>
+    </div>
+    <div *ngIf="type === 'circuit'">
+      <p><label>Name:
+        <input [(ngModel)]="circuit" placeholder="Name">
+      </label></p>
+      <button (click)="search_circuit()">Search</button>
+    </div>
+    <div *ngIf="type === 'car'">
+      <p><label>Model:
+        <input [(ngModel)]="car_model" placeholder="Model">
+      </label></p>
+      <p><label>Pilot:
+        <input [(ngModel)]="car_pilot" placeholder="Pilot">
+      </label></p>
+      <button (click)="search_car()">Search</button>
+    </div>
+    <div *ngIf="type === 'country'">
+      <p><label>Designation:
+        <input [(ngModel)]="country" placeholder="Designation">
+      </label></p>
+      <button (click)="search_country()">Search</button>
+    </div>
+    <div *ngIf="type === 'teamleader'">
+      <p><label>Name:
+        <input [(ngModel)]="teamleader" placeholder="Name">
+      </label></p>
+      <button (click)="search_teamleader()">Search</button>
+    </div>
+  </div>
+  <ng-container *ngIf="results.length > 0">
+    <p>Found {{ results.length }} result{{ results.length > 1 ? 's' : '' }}.</p>
+    <div class="gaming-library">
+      <div class="col-lg-12">
+        <div class="item" *ngFor="let group of results">
+          <a *ngFor="let element of group" routerLink="{{ element.url }}">{{ element.str }}</a>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Search</button>
-    </form>
-  </div>
+    </div>
+  </ng-container>
+  <p *ngIf="results.length == 0">Not found any result.</p>
 </div>
--->
