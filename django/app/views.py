@@ -113,8 +113,8 @@ def car_get(req):
         team = pilot.team
         ta = TeamSerializer(team)
         header = HeaderSerializer({'header': 'Car Details'})
-        is_authenticated = IsAuthenticated()
-        is_superuser = IsAdminUser()
+        is_authenticated = req.user.is_authenticated
+        is_superuser = req.user.is_superuser
         auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
     except Car.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -189,8 +189,8 @@ def circuit_get(req):
     try:
         circuit = Circuit.objects.get(id=_id)
         races = Race.objects.filter(circuit=circuit)
-        is_authenticated = IsAuthenticated()
-        is_superuser = IsAdminUser()
+        is_authenticated = req.user.is_authenticated
+        is_superuser = req.user.is_superuser
         country = circuit.country
         last_winner = circuit.last_winner
     except Circuit.DoesNotExist:
@@ -270,8 +270,8 @@ def country_get(req):
         country = Country.objects.get(id=_id)
         pilots = Pilot.objects.filter(country=country)
         circuits = Circuit.objects.filter(country=country)
-        is_authenticated = IsAuthenticated()
-        is_superuser = IsAdminUser()
+        is_authenticated = req.user.is_authenticated
+        is_superuser = req.user.is_superuser
     except Country.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = CountrySerializer(country)
@@ -355,8 +355,8 @@ def pilot_get(req):
             serializer2 = FavSerializer({'is_fav': is_fav})
         results = Result.objects.filter(pilot=pilot).order_by('-race__date')
         team = pilot.team
-        is_authenticated = IsAuthenticated()
-        is_superuser = IsAdminUser()
+        is_authenticated = req.user.is_authenticated
+        is_superuser = req.user.is_superuser
         countries = pilot.country
         races = []
         for result in results:
@@ -460,8 +460,8 @@ def race_get(req):
     try:
         race = Race.objects.get(id=_id)
         results = Result.objects.filter(race=race).order_by('position')
-        is_authenticated = IsAuthenticated()
-        is_superuser = IsAdminUser()
+        is_authenticated = req.user.is_authenticated
+        is_superuser = req.user.is_superuser
         circuit = race.circuit
         pilots = []
         for result in results:
@@ -586,8 +586,8 @@ def team_get(req):
                 faved = False
             serializer2 = FavSerializer({'is_fav': faved})
         pilots = Pilot.objects.filter(team=team)
-        is_authenticated = IsAuthenticated()
-        is_superuser = IsAdminUser()
+        is_authenticated = req.user.is_authenticated
+        is_superuser = req.user.is_superuser
         teamleader = TeamLeader.objects.filter(team=team)
 
         points = 0
@@ -674,8 +674,8 @@ def teamleader_get(req):
     _id = int(req.GET['id'])
     try:
         teamleader = TeamLeader.objects.get(id=_id)
-        is_authenticated = IsAuthenticated()
-        is_superuser = IsAdminUser()
+        is_authenticated = req.user.is_authenticated
+        is_superuser = req.user.is_superuser
         team = teamleader.team
     except TeamLeader.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
