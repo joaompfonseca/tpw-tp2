@@ -26,4 +26,4 @@ dependencies inside `package.json` (see [Installation](#installation) section).
 
 ## Public Deployment
 
-- Click [here]() to access the application (Heroku).
+- Click [here](https://tpw-tp2.web.app/) to access the application (Firebase).

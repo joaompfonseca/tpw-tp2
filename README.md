@@ -21,8 +21,15 @@ This project was done by:
 
 ## Public Deployment
 
-- Click [here]() to access the application (Heroku).
+- Click [here](https://tpw-tp2.web.app/) to access the application (Firebase).
 - Click [here](https://joaompfonseca.pythonanywhere.com/) to access the API (Python Anywhere).
+
+## Credentials of Created Users
+
+| Role          | Username | Password      |
+|---------------|----------|---------------|
+| Administrator | admin    | admin         |
+| Normal User   | user     | iloveformula1 |
 
 ## More Information
 
