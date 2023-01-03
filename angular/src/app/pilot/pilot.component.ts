@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {User} from "../../interfaces/user";
 import {Pilot} from "../../interfaces/pilot";
 import {Result} from "../../interfaces/result";
-import {Race} from "../../interfaces/race";
 import {PilotService} from "../../services/pilot/pilot.service";
 import {ActivatedRoute} from "@angular/router";
 import {DomSanitizer} from "@angular/platform-browser";
@@ -47,7 +46,6 @@ export class PilotComponent implements OnInit {
 
   getPilot() {
     this.pilotService.getPilot(this.pilotId!).subscribe(data => {
-      console.log(data)
       this.pilot = data.pilot;
       this.pilot!.country = data.country;
       this.pilot!.team = data.team;

@@ -79,7 +79,6 @@ export class EditComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(document.cookie);
     this.type = this.route.snapshot.data['type'];
     switch (this.type) {
       case 'pilot':
@@ -147,7 +146,6 @@ export class EditComponent implements OnInit {
     let id = this.route.snapshot.params['id'];
     this.countryService.getCountry(id).subscribe(data => {
       this.country = data.country;
-      console.log(this.country);
     });
   }
 
@@ -227,15 +225,12 @@ export class EditComponent implements OnInit {
       let ct = []
       for (let t of temp) {
         if (!ids.includes(t.id)) {
-          console.log(t);
           this.Countries.push(t);
         } else {
           ct.push(t);
         }
       }
-      console.log(ct)
       this.selectedCountryP = ct;
-      console.log(this.Countries);
     });
   }
 

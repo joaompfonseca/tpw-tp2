@@ -37,7 +37,6 @@ export class CircuitComponent implements OnInit {
 
   getCircuit() {
     this.circuitService.getCircuit(this.circuitId!).subscribe(data => {
-      console.log(data);
       this.header = data.header.header;
       this.user = data.auth;
       this.circuit = data.circuit;

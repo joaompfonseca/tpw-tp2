@@ -35,7 +35,6 @@ export class CarComponent implements OnInit {
 
   getCar() {
     this.carService.getCar(this.carId!).subscribe(data => {
-      console.log(data);
       this.header = data.header.header;
       this.user = data.auth;
       this.car = data.car;

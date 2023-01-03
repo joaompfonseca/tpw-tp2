@@ -235,7 +235,6 @@ export class NewComponent implements OnInit {
   getAllPilots() {
     this.pilotService.getPilots().subscribe(data => {
       this.Pilots = data;
-      console.log(this.Teams);
     });
     this.getAllCountries();
   }
@@ -275,7 +274,6 @@ export class NewComponent implements OnInit {
   getAllTeams() {
     this.teamService.getTeams().subscribe(data => {
       this.Teams = data;
-      console.log(this.Teams);
       this.getAllCountries();
     });
   }
@@ -283,7 +281,6 @@ export class NewComponent implements OnInit {
   getAllCountries() {
     this.countryService.getCountries().subscribe(data => {
       this.Countries = data;
-      console.log(this.Countries);
     });
   }
 
