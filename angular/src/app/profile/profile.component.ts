@@ -15,6 +15,7 @@ import {Router} from "@angular/router";
 export class ProfileComponent implements OnInit {
 
   profile: Profile | undefined;
+  editing = false;
 
   constructor(
     private profileService: ProfileService,
@@ -61,6 +62,16 @@ export class ProfileComponent implements OnInit {
           t.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
         });
     }
+  }
+
+  edit() {
+    this.editing = true;
+  }
+
+  save() {
+    this.profileService.updateProfile(this.profile!).subscribe(() => {
+      this.editing = false;
+    });
   }
 
   logout() {
