@@ -40,7 +40,7 @@ export class RaceComponent implements OnInit {
       this.header = data.header.header;
       this.race = data.race;
       this.race!.circuit = data.circuit;
-      this.race!.fast_lap = data.race.fast_lap.substring(3);
+      this.race!.fast_lap = data.race.fast_lap;
       this.user = data.auth;
       let results = data.results;
       let pilots = data.pilots;

@@ -287,7 +287,7 @@ export class NewComponent implements OnInit {
     });
   }
 
-  newPilot() {
+  createPilot() {
     let id_c = [];
     for (let c of this.selectedCountryP!) {
       id_c.push(c.id);

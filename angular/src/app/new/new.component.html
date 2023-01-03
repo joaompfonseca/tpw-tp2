@@ -8,7 +8,7 @@
       <td><input [(ngModel)]="pilot!.name" placeholder="Name"></td>
     </tr>
     <tr><th>Birth Data:</th>
-      <td><input [(ngModel)]="pilot!.date" placeholder="Birth Data"></td>
+      <td><input [(ngModel)]="pilot!.date" placeholder="YYYY-MM-DD"></td>
     </tr>
     <tr><th>Victories:</th>
       <td><input [(ngModel)]="pilot!.victories" placeholder="Victories"></td>
@@ -38,8 +38,10 @@
         <option *ngFor="let country of Countries" [ngValue]="country" >{{ country.designation }}</option>
       </select></td>
     </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="createPilot()">New</button>
+      </tr>
     </table>
-    <button (click)="newPilot()">New</button>
   </div>
 
   <div *ngIf="type === 'team'">
@@ -48,13 +50,15 @@
         <td><input [(ngModel)]="team!.name" placeholder="Name"></td>
       </tr>
       <tr><th>Foundation Date:</th>
-        <td><input [(ngModel)]="team!.date" placeholder="Foundation Date"></td>
+        <td><input [(ngModel)]="team!.date" placeholder="YYYY-MM-DD"></td>
       </tr>
       <tr><th>Championships:</th>
         <td><input [(ngModel)]="team!.championships" placeholder="Championships"></td>
       </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="createTeam()">New</button>
+      </tr>
     </table>
-    <button (click)="createTeam()">New</button>
   </div>
 
   <div *ngIf="type === 'race'">
@@ -63,7 +67,7 @@
         <td><input [(ngModel)]="race!.name" placeholder="Name"></td>
       </tr>
       <tr><th>Date:</th>
-        <td><input [(ngModel)]="race!.date" placeholder="Date"></td>
+        <td><input [(ngModel)]="race!.date" placeholder="YYYY-MM-DD"></td>
       </tr>
       <tr><th>Season:</th>
         <td><input [(ngModel)]="race!.season" placeholder="Season"></td>
@@ -76,8 +80,10 @@
           <option *ngFor="let circuit of Circuits" [ngValue]="circuit" >{{ circuit.name }}</option>
         </select></td>
       </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="createRace()">New</button>
+      </tr>
     </table>
-    <button (click)="createRace()">New</button>
   </div>
 
   <div *ngIf="type === 'circuit'">
@@ -101,8 +107,10 @@
           <option *ngFor="let country of Countries" [ngValue]="country" >{{ country.designation }}</option>
         </select></td>
       </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="createCircuit()">New</button>
+      </tr>
     </table>
-    <button (click)="createCircuit()">New</button>
   </div>
 
   <div *ngIf="type === 'car'">
@@ -121,8 +129,10 @@
           <option *ngFor="let pilot of Pilots" [ngValue]="pilot" >{{ pilot.name }}</option>
         </select></td>
       </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="createCar()">New</button>
+      </tr>
     </table>
-    <button (click)="createCar()">New</button>
   </div>
 
   <div *ngIf="type === 'country'">
@@ -133,8 +143,10 @@
       <tr><th>Code:</th>
         <td><input [(ngModel)]="country!.code" placeholder="Code"></td>
       </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="createCountry()">New</button>
+      </tr>
     </table>
-    <button (click)="createCountry()">New</button>
   </div>
 
   <div *ngIf="type === 'teamleader'">
@@ -147,28 +159,9 @@
           <option *ngFor="let team of Teams" [ngValue]="team" >{{ team.name }}</option>
         </select></td>
       </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="createTeamLeader()">New</button>
+      </tr>
     </table>
-    <button (click)="createTeamLeader()">Update</button>
   </div>
 </div>
-
-
-
-<!--
-<h2>{{ header }}</h2>
-<br>
-
-<div class="gaming-library">
-  <div class="col-lg-12">
-    <form (ngSubmit)="onSubmit()" #form="ngForm" method="post">
-      <table style="border-collapse: separate; border-spacing: 1em; color: white">
-        <tr *ngFor="let field of form">
-          <th>{{ field.label_tag }}</th>
-          <td>{{ field }}</td>
-        </tr>
-      </table>
-      <input type="submit" value="Add" class="btn btn-primary">
-    </form>
-  </div>
-</div>
--->
