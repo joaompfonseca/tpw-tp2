@@ -26,7 +26,7 @@ export class LoginComponent {
 
     if (!this.emptyFields) {
       this.userService.login(this.username, this.password).subscribe(
-        () => this.router.navigate(['/']).then(() => window.location.reload()),
+        () => this.router.navigate(['/profile']).then(() => window.location.reload()),
         () => this.errors = true
       );
     }
