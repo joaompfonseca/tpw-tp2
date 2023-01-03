@@ -6,6 +6,7 @@ import {Race} from "../../interfaces/race";
 import {PilotService} from "../../services/pilot/pilot.service";
 import {ActivatedRoute} from "@angular/router";
 import {DomSanitizer} from "@angular/platform-browser";
+import {ProfileService} from "../../services/profile/profile.service";
 
 @Component({
   selector: 'app-pilot',
@@ -29,6 +30,7 @@ export class PilotComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private pilotService: PilotService,
+    private profileService: ProfileService,
     private sanitizer: DomSanitizer
   ) {
   }
@@ -45,10 +47,12 @@ export class PilotComponent implements OnInit {
 
   getPilot() {
     this.pilotService.getPilot(this.pilotId!).subscribe(data => {
+      console.log(data)
       this.pilot = data.pilot;
       this.pilot!.country = data.country;
       this.pilot!.team = data.team;
       this.pilot!.points = data.points.points;
+      this.pilot!.is_fav = data.is_fav.is_fav;
       this.results = data.results;
       this.results!.forEach(result => {
         for (let race of data.races) {
@@ -71,9 +75,9 @@ export class PilotComponent implements OnInit {
       });
   }
 
-  addToFavourites() {
-  }
-
-  removeFromFavourites() {
+  toggleFavourite() {
+    const bool = !this.pilot!.is_fav;
+    this.pilot!.is_fav = bool;
+    this.profileService.toggleFavouritePilot(this.pilotId!, bool).subscribe();
   }
 }

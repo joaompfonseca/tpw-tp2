@@ -32,4 +32,14 @@ export class ProfileService {
     const url = this.baseURL + 'profileupdate';
     return this.http.put(url, profile, httpOptions);
   }
+
+  toggleFavouritePilot(id: number, bool: boolean): Observable<any> {
+    const url = this.baseURL + 'pilotfav' + ((bool) ? 'add' : 'rem') + '?id=' + id;
+    return this.http.post(url, {}, {withCredentials: true});
+  }
+
+  toggleFavouriteTeam(id: number, bool: boolean): Observable<any> {
+    const url = this.baseURL + 'teamfav' + ((bool) ? 'add' : 'rem') + '?id=' + id;
+    return this.http.post(url, {}, {withCredentials: true});
+  }
 }

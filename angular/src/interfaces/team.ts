@@ -8,5 +8,6 @@ export interface Team {
   championships?: number
   points?: number
   image?: SafeUrl
-  teamleader?: TeamLeader
+  teamleader?: TeamLeader,
+  is_fav: boolean
 }

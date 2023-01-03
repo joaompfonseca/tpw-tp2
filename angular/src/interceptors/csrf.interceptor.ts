@@ -8,7 +8,6 @@ export class CsrfInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     // Retrieve the CSRF token from a cookie or from local storage
     const csrfToken = this.getCsrfToken();
-    console.log("Here")
 
     // Clone the request and add the CSRF token to the headers
     const modifiedReq = req.clone({
@@ -22,7 +21,7 @@ export class CsrfInterceptor implements HttpInterceptor {
   getCsrfToken(): string {
     // Try to retrieve the CSRF token from a cookie
     const csrfCookie = this.getCookie('csrftoken');
-    console.log(csrfCookie);
+
     if (csrfCookie) {
       return csrfCookie;
     }

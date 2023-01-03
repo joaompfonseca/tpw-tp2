@@ -605,7 +605,7 @@ def team_get(req):
     auth = AuthSerializer({'is_authenticated': is_authenticated, 'is_superuser': is_superuser})
     if serializer2:
         return Response(
-            {'team': serializer.data, 'pilots': serializer1.data, 'fav': serializer2.data, 'header': header.data,
+            {'team': serializer.data, 'pilots': serializer1.data, 'is_fav': serializer2.data, 'header': header.data,
              'auth': auth.data, 'teamleader': serializer3.data, 'points': points.data})
     else:
         return Response({'team': serializer.data, 'pilots': serializer1.data, 'header': header.data, 'auth': auth.data,

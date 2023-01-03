@@ -19,7 +19,7 @@ export class TeamService {
 
   getTeam(id: number): Observable<any> {
     const url = this.baseURL + "team?id=" + id;
-    return this.http.get<any>(url);
+    return this.http.get<any>(url, {withCredentials: true});
   }
 
   getTeamImage(id: number): Observable<Blob> {

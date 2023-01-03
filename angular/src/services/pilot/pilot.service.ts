@@ -20,7 +20,7 @@ export class PilotService {
 
   getPilot(id: number): Observable<any> {
     const url = this.baseURL + "pilot?id=" + id;
-    let pilot: Observable<any> = this.http.get<any>(url);
+    let pilot: Observable<any> = this.http.get<any>(url, {withCredentials: true});
     return pilot;
   }
 
