@@ -16,6 +16,7 @@ export class ProfileComponent implements OnInit {
 
   profile: Profile | undefined;
   editing = false;
+  emptyFields = false;
 
   constructor(
     private profileService: ProfileService,
@@ -78,9 +79,16 @@ export class ProfileComponent implements OnInit {
   }
 
   save() {
-    this.profileService.updateProfile(this.profile!).subscribe(() => {
-      this.editing = false;
-    });
+    this.emptyFields = (this.profile!.user.first_name == ''
+      || this.profile!.user.last_name == ''
+      || this.profile!.user.email == ''
+      || this.profile!.biography == '');
+
+    if (!this.emptyFields) {
+      this.profileService.updateProfile(this.profile!).subscribe(() => {
+        this.editing = false;
+      });
+    }
   }
 
   logout() {

@@ -51,6 +51,9 @@
                   </td>
                 </tr>
               </table>
+              <p *ngIf="emptyFields" class="validation-summary-errors" style="color: #a80000">
+                Please fill all form fields.
+              </p>
             </div>
             <div class="row">
               <div class="col-lg-12">
