@@ -34,7 +34,10 @@ export class LoginpartialComponent implements OnInit {
 
   getProfileImage() {
     this.profileService.getProfileImage().subscribe(image => {
-      this.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+      if (image.type == 'text/html')
+        this.image = 'assets/images/profile-default.jpg';
+      else
+        this.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
     });
   }
 }

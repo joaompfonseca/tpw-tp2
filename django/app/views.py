@@ -1,9 +1,11 @@
 from django.contrib.auth import authenticate, login, get_user, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import AnonymousUser
+from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.http import FileResponse, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
+from django.templatetags.static import static
 from rest_framework import status, authentication, permissions, views, generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -64,8 +66,10 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        user1 = authenticate(username=user.username, password=request.data['password'])
-        Profile.objects.create(user=user1, profile_image='/images/profiles/profile.jpg')
+        authenticate(username=user.username, password=request.data['password'])
+        login(request, user)
+        profile = Profile.objects.create(user=user)
+        profile.save()
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
         })
@@ -840,6 +844,8 @@ def get_image(req, type, _id=None):
             return HttpResponse("<html></html>")
     elif type == 'profile':
         image = Profile.objects.get(user=req.user).profile_image
+        if image == '':
+            return HttpResponse("<html></html>")
     else:
         return HttpResponseNotFound()
     return HttpResponse(image, content_type='image/png')
