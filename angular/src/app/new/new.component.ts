@@ -80,13 +80,16 @@ export class NewComponent implements OnInit {
       team: {
         id:0,
         name:'',
-      }
+        is_fav: false,
+      },
+      is_fav: false,
     }
     this.team = {
       id:0,
       name:'',
       date: undefined,
       championships:undefined,
+      is_fav: false,
     }
     this.race = {
       id:0,
@@ -105,7 +108,9 @@ export class NewComponent implements OnInit {
           team: {
             id:0,
             name:'',
-          }
+            is_fav: false
+          },
+          is_fav: false
         },
         country: {
           id:0,
@@ -125,7 +130,9 @@ export class NewComponent implements OnInit {
         team: {
           id:0,
           name:'',
-        }
+          is_fav: false
+        },
+        is_fav: false
       },
       country: {
         id:0,
@@ -144,7 +151,9 @@ export class NewComponent implements OnInit {
         team: {
           id:0,
           name:'',
-        }
+          is_fav: false
+        },
+        is_fav: false
       }
     }
     this.country = {
@@ -160,6 +169,7 @@ export class NewComponent implements OnInit {
         name:'',
         date: undefined,
         championships:undefined,
+        is_fav: false
       }
     }
   }
