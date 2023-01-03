@@ -2,12 +2,17 @@
   <h2>{{ header }}</h2>
   <br>
 
-  <ng-container *ngIf="user && user.is_authenticated && user.is_superuser && actions.length > 0">
+  <ng-container *ngIf="actions.length > 0">
     <p>
       <strong>Actions: </strong>
-      <ng-container *ngFor="let action of actions; let last = last">
-        <a routerLink="{{ action.url }}">{{ action.str }}</a>
-        <ng-container *ngIf="!last"> - </ng-container>
+      <ng-container *ngFor="let action of actions; let first = first; let last = last">
+        <ng-container *ngIf="first">
+          <a routerLink="{{ action.url }}">{{ action.str }}</a>
+        </ng-container>
+        <ng-container *ngIf="!first && user && user.is_authenticated && user.is_superuser">
+          <a routerLink="{{ action.url }}">{{ action.str }}</a>
+        </ng-container>
+        <ng-container *ngIf="!last && user && user.is_authenticated && user.is_superuser"> - </ng-container>
       </ng-container>
     </p>
   </ng-container>

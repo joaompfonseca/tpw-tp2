@@ -2,62 +2,86 @@
 <br>
 
 <div class="gaming-library">
-  <div class="col-lg-12">
+  <table style="border-collapse: separate; border-spacing: 1em; color: white">
     <div *ngIf="type === 'pilot'">
-      <p><label>Name:
-        <input [(ngModel)]="pilot" placeholder="Name">
-      </label></p>
-      <button (click)="search_pilot()">Search</button>
+      <tr>
+        <th>Name:</th>
+        <td><input [(ngModel)]="pilot" placeholder="Name"></td>
+      </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="search_pilot()">Search</button>
+      </tr>
     </div>
     <div *ngIf="type === 'team'">
-      <p><label>Name:
-        <input [(ngModel)]="team" placeholder="Name">
-      </label></p>
-      <button (click)="search_team()">Search</button>
+      <tr>
+        <th>Name:</th>
+        <td><input [(ngModel)]="team" placeholder="Name"></td>
+      </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="search_team()">Search</button>
+      </tr>
     </div>
     <div *ngIf="type === 'race'">
-      <p><label>Name:
-        <input [(ngModel)]="race" placeholder="Name">
-      </label></p>
-      <button (click)="search_race()">Search</button>
+      <tr>
+        <th>Name:</th>
+        <td><input [(ngModel)]="race" placeholder="Name"></td>
+      </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="search_race()">Search</button>
+      </tr>
     </div>
     <div *ngIf="type === 'circuit'">
-      <p><label>Name:
-        <input [(ngModel)]="circuit" placeholder="Name">
-      </label></p>
-      <button (click)="search_circuit()">Search</button>
+      <tr>
+        <th>Name:</th>
+        <td><input [(ngModel)]="circuit" placeholder="Name"></td>
+      </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="search_circuit()">Search</button>
+      </tr>
     </div>
     <div *ngIf="type === 'car'">
-      <p><label>Model:
-        <input [(ngModel)]="car_model" placeholder="Model">
-      </label></p>
-      <p><label>Pilot:
-        <input [(ngModel)]="car_pilot" placeholder="Pilot">
-      </label></p>
-      <button (click)="search_car()">Search</button>
+      <tr>
+        <th>Model:</th>
+        <td><input [(ngModel)]="car_model" placeholder="Model"></td>
+      </tr>
+      <tr>
+        <th>Pilot:</th>
+        <td><input [(ngModel)]="car_pilot" placeholder="Pilot"></td>
+      </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="search_car()">Search</button>
+      </tr>
     </div>
     <div *ngIf="type === 'country'">
-      <p><label>Designation:
-        <input [(ngModel)]="country" placeholder="Designation">
-      </label></p>
-      <button (click)="search_country()">Search</button>
+      <tr>
+        <th>Designation:</th>
+        <td><input [(ngModel)]="country" placeholder="Designation"></td>
+      </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="search_country()">Search</button>
+      </tr>
     </div>
     <div *ngIf="type === 'teamleader'">
-      <p><label>Name:
-        <input [(ngModel)]="teamleader" placeholder="Name">
-      </label></p>
-      <button (click)="search_teamleader()">Search</button>
+      <tr>
+        <th>Name:</th>
+        <td><input [(ngModel)]="teamleader" placeholder="Name"></td>
+      </tr>
+      <tr>
+        <button class="btn btn-primary" (click)="search_teamleader()">Search</button>
+      </tr>
     </div>
-  </div>
-  <ng-container *ngIf="results.length > 0">
-    <p>Found {{ results.length }} result{{ results.length > 1 ? 's' : '' }}.</p>
-    <div class="gaming-library">
-      <div class="col-lg-12">
-        <div class="item" *ngFor="let group of results">
-          <a *ngFor="let element of group" routerLink="{{ element.url }}">{{ element.str }}</a>
+    <tr>
+      <ng-container *ngIf="results.length > 0">
+        <p>Found {{ results.length }} result{{ results.length > 1 ? 's' : '' }}.</p>
+        <div class="gaming-library">
+          <div class="col-lg-12">
+            <div class="item" *ngFor="let group of results">
+              <a *ngFor="let element of group" routerLink="{{ element.url }}">{{ element.str }}</a>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </ng-container>
-  <p *ngIf="results.length == 0">Not found any result.</p>
+      </ng-container>
+      <p *ngIf="results.length == 0">Not found any result.</p>
+    </tr>
+  </table>
 </div>

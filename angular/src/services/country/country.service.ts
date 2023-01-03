@@ -32,7 +32,7 @@ export class CountryService {
   }
 
   searchCountry(name: string): Observable<Country[]> {
-    const url = this.baseURL + "countrysearch?name=" + name;
+    const url = this.baseURL + "countrysearch?designation=" + name;
     return this.http.get<Country[]>(url, httpOptions);
   }
 
