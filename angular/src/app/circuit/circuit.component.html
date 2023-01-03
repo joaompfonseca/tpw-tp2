@@ -1,8 +1,8 @@
-<div *ngIf="header && user && circuit && races; else loader">
+<div *ngIf="header && circuit && races; else loader">
   <h2>{{ header }}</h2>
   <br>
 
-  <ng-container *ngIf="user.is_authenticated && user.is_superuser">
+  <ng-container *ngIf="user && user.is_authenticated && user.is_superuser">
     <p>
       <strong>Actions: </strong>
       <a routerLink="/circuits/{{circuit.id}}/edit">Edit Circuit</a>

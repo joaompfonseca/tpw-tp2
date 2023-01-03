@@ -52,7 +52,7 @@ export class PilotComponent implements OnInit {
       this.pilot!.country = data.country;
       this.pilot!.team = data.team;
       this.pilot!.points = data.points.points;
-      this.pilot!.is_fav = data.is_fav.is_fav;
+      this.pilot!.is_fav = data.is_fav?.is_fav;
       this.results = data.results;
       this.results!.forEach(result => {
         for (let race of data.races) {

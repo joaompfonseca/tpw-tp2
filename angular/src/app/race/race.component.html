@@ -1,8 +1,8 @@
-<div *ngIf="header && user && race && results; else loader">
+<div *ngIf="header && race && results; else loader">
   <h2>{{ header }}</h2>
   <br>
 
-  <div *ngIf="user.is_authenticated && user.is_superuser">
+  <div *ngIf="user && user.is_authenticated && user.is_superuser">
     <p>
       <strong>Actions: </strong>
       <a routerLink="/races/{{race.id}}/edit">Edit Race</a>
@@ -26,13 +26,13 @@
           <th>Position</th>
           <th>Pilot</th>
           <th>Points</th>
-          <th *ngIf="user.is_authenticated && user.is_superuser">Actions</th>
+          <th *ngIf="user && user.is_authenticated && user.is_superuser">Actions</th>
         </tr>
         <tr *ngFor="let r of results">
           <td>{{ r.position }}</td>
           <td><a routerLink="/pilots/{{r.pilot.id}}">{{ r.pilot.name }}</a></td>
           <td>{{ r.points }}</td>
-          <td *ngIf="user.is_authenticated && user.is_superuser">
+          <td *ngIf="user && user.is_authenticated && user.is_superuser">
             <a routerLink="/results/{{r.id}}/edit">Edit</a>
           </td>
         </tr>

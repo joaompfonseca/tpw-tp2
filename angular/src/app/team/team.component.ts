@@ -49,7 +49,7 @@ export class TeamComponent {
       this.team = data.team;
       this.team!.teamleader = data.teamleader[0];
       this.team!.points = data.points.points;
-      this.team!.is_fav = data.is_fav.is_fav;
+      this.team!.is_fav = data.is_fav?.is_fav;
       this.header = data.header.header;
       this.pilots = data.pilots;
       this.user = data.auth;
