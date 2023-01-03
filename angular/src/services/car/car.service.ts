@@ -31,22 +31,8 @@ export class CarService {
     return this.http.post(url, car, httpOptions)
   }
 
-  searchCar(model?: string, pilot?: string): Observable<Car[]> {
-    if (model && pilot) {
-      const url = this.baseURL + "carsearch?model=" + model + "&pilot=" + pilot;
-      return this.http.get<Car[]>(url);
-    }
-
-    if (model && !pilot) {
-      const url = this.baseURL + "carsearch?model=" + model;
-      return this.http.get<Car[]>(url);
-    }
-
-    if (pilot && !model) {
-      const url = this.baseURL + "carsearch?pilot=" + pilot;
-      return this.http.get<Car[]>(url);
-    }
-    const url = this.baseURL + "carsearch?model=''&pilot=''";
+  searchCar(model: string, pilot: string): Observable<Car[]> {
+    const url = this.baseURL + "carsearch?model=" + model + "&pilot=" + pilot;
     return this.http.get<Car[]>(url);
   }
 

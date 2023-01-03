@@ -31,8 +31,8 @@ export class CountryService {
     return this.http.post(url, country, httpOptions)
   }
 
-  searchCountry(name: string): Observable<Country[]> {
-    const url = this.baseURL + "countrysearch?name=" + name;
+  searchCountry(designation: string): Observable<Country[]> {
+    const url = this.baseURL + "countrysearch?designation=" + designation;
     return this.http.get<Country[]>(url);
   }
 
