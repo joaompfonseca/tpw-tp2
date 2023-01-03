@@ -20,8 +20,9 @@ import { TeamComponent } from './team/team.component';
 import { TeamleaderComponent } from './teamleader/teamleader.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import {HttpClientModule, HttpClientXsrfModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule, HttpClientXsrfModule} from '@angular/common/http';
 import {FormsModule} from "@angular/forms";
+import {CsrfInterceptor} from "../interceptors/csrf.interceptor";
 
 @NgModule({
   declarations: [
@@ -50,7 +51,12 @@ import {FormsModule} from "@angular/forms";
     HttpClientXsrfModule,
     FormsModule,
   ],
-  providers: [],
+  providers: [CsrfInterceptor,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CsrfInterceptor,
+      multi: true
+    }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
