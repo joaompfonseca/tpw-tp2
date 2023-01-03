@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {PilotService} from "../../services/pilot/pilot.service";
 import {TeamService} from "../../services/team/team.service";
@@ -29,7 +29,7 @@ export class NewComponent implements OnInit {
 
   pilot: Pilot;
 
-  team : Team;
+  team: Team;
 
   race: Race;
 
@@ -75,264 +75,235 @@ export class NewComponent implements OnInit {
     this.header = '';
     this.type = '';
     this.pilot = {
-      id:0,
-      name:'',
+      id: 0,
+      name: '',
       team: {
-        id:0,
-        name:'',
+        id: 0,
+        name: '',
         is_fav: false,
       },
       is_fav: false,
     }
     this.team = {
-      id:0,
-      name:'',
+      id: 0,
+      name: '',
       date: undefined,
-      championships:undefined,
+      championships: undefined,
       is_fav: false,
     }
     this.race = {
-      id:0,
-      name:'',
+      id: 0,
+      name: '',
       date: undefined,
-      season:undefined,
-      fast_lap:undefined,
+      season: undefined,
+      fast_lap: undefined,
       circuit: {
-        id:0,
-        name:'',
-        length:undefined,
-        location:undefined,
+        id: 0,
+        name: '',
+        length: undefined,
+        location: undefined,
         last_winner: {
-          id:0,
-          name:'',
+          id: 0,
+          name: '',
           team: {
-            id:0,
-            name:'',
+            id: 0,
+            name: '',
             is_fav: false
           },
           is_fav: false
         },
         country: {
-          id:0,
-          designation:'',
-          code:'',
+          id: 0,
+          designation: '',
+          code: '',
         }
       }
     }
     this.circuit = {
-      id:0,
-      name:'',
-      length:undefined,
-      location:undefined,
+      id: 0,
+      name: '',
+      length: undefined,
+      location: undefined,
       last_winner: {
-        id:0,
-        name:'',
+        id: 0,
+        name: '',
         team: {
-          id:0,
-          name:'',
+          id: 0,
+          name: '',
           is_fav: false
         },
         is_fav: false
       },
       country: {
-        id:0,
-        designation:'',
-        code:'',
+        id: 0,
+        designation: '',
+        code: '',
       }
     }
     this.car = {
-      id:0,
-      model:'',
-      engine:'',
-      weight:0,
+      id: 0,
+      model: '',
+      engine: '',
+      weight: 0,
       pilot: {
-        id:0,
-        name:'',
+        id: 0,
+        name: '',
         team: {
-          id:0,
-          name:'',
+          id: 0,
+          name: '',
           is_fav: false
         },
         is_fav: false
       }
     }
     this.country = {
-      id:0,
-      designation:'',
-      code:'',
+      id: 0,
+      designation: '',
+      code: '',
     }
     this.teamleader = {
-      id:0,
-      name:'',
+      id: 0,
+      name: '',
       team: {
-        id:0,
-        name:'',
+        id: 0,
+        name: '',
         date: undefined,
-        championships:undefined,
+        championships: undefined,
         is_fav: false
       }
     }
   }
 
-    ngOnInit(){
-      this.type = this.route.snapshot.data['type'];
-      switch (this.type) {
-        case 'pilot':
-          this.header = 'Add new pilot';
-          this.getAllTeams();
-          break;
-        case 'team':
-          this.header = 'Add new team';
-          break;
-        case 'race':
-          this.header = 'Add new Race';
-          this.getAllCircuits();
-          break;
-        case 'circuit':
-          this.header = 'Add new Circuit';
-          this.getAllPilots();
-          break;
-        case 'car':
-          this.header = 'Add new Car';
-          this.getAllPilots();
-          break;
-        case 'country':
-          this.header = 'Add new Country';
-          break;
-        case 'teamleader':
-          this.header = 'Add new Team Leader';
-          this.getAllTeams();
-          break;
-      }
+  ngOnInit() {
+    this.type = this.route.snapshot.data['type'];
+    switch (this.type) {
+      case 'pilot':
+        this.header = 'Add new pilot';
+        this.getAllTeams();
+        break;
+      case 'team':
+        this.header = 'Add new team';
+        break;
+      case 'race':
+        this.header = 'Add new Race';
+        this.getAllCircuits();
+        break;
+      case 'circuit':
+        this.header = 'Add new Circuit';
+        this.getAllPilots();
+        break;
+      case 'car':
+        this.header = 'Add new Car';
+        this.getAllPilots();
+        break;
+      case 'country':
+        this.header = 'Add new Country';
+        break;
+      case 'teamleader':
+        this.header = 'Add new Team Leader';
+        this.getAllTeams();
+        break;
     }
+  }
 
-    createTeamLeader() {
-      this.teamleaderService.createTeamLeader({
-        name: this.teamleader!.name,
-        team: this.selectedTeamTL?.id
-      }).subscribe(data => {
-        console.log(data);
-      });
-      this.router.navigate(['/teamleaders']);
-    }
+  createTeamLeader() {
+    this.teamleaderService.createTeamLeader({
+      name: this.teamleader!.name,
+      team: this.selectedTeamTL?.id
+    })
+      .subscribe(() => this.router.navigate(['/teamleaders']).then(() => window.location.reload()));
+  }
 
-    createCountry(){
-      this.countryService.createCountry({
-        designation: this.country!.designation,
-        code: this.country!.code,
-      }).subscribe(data => {
-        console.log(data);
-      });
-      this.router.navigate(['/countries']);
-    }
+  createCountry() {
+    this.countryService.createCountry({
+      designation: this.country!.designation,
+      code: this.country!.code,
+    })
+      .subscribe(() => this.router.navigate(['/countries']).then(() => window.location.reload()));
+  }
 
-    createCar() {
-      this.carService.createCar({
-        model: this.car!.model,
-        engine: this.car!.engine,
-        weight: this.car!.weight,
-        pilot: this.selectedPilotCar?.id
-      }).subscribe(data => {
-        console.log(data);
-      });
-      this.router.navigate(['/cars']);
-    }
+  createCar() {
+    this.carService.createCar({
+      model: this.car!.model,
+      engine: this.car!.engine,
+      weight: this.car!.weight,
+      pilot: this.selectedPilotCar?.id
+    })
+      .subscribe(() => this.router.navigate(['/cars']).then(() => window.location.reload()));
+  }
 
-    getAllPilots() {
-      this.pilotService.getPilots().subscribe(data => {
-        this.Pilots = data;
-        console.log(this.Teams);
-      });
+  getAllPilots() {
+    this.pilotService.getPilots().subscribe(data => {
+      this.Pilots = data;
+      console.log(this.Teams);
+    });
+    this.getAllCountries();
+  }
+
+  createCircuit() {
+    this.circuitService.createCircuit({
+      name: this.circuit!.name,
+      length: this.circuit!.length,
+      location: this.circuit!.location,
+      last_winner: this.selectedPilotC?.id,
+      country: this.selectedCountryC?.id
+    })
+      .subscribe(() => this.router.navigate(['/circuits']).then(() => window.location.reload()));
+  }
+
+  getAllCircuits() {
+    this.circuitService.getCircuits()
+      .subscribe(() => this.router.navigate(['/circuits']).then(() => window.location.reload()));
+  }
+
+  createRace() {
+    this.raceService.createRace({
+      name: this.race!.name,
+      date: this.race!.date,
+      season: this.race!.season,
+      fast_lap: this.race!.fast_lap,
+      circuit: this.selectedCircuitR?.id
+    })
+      .subscribe(() => this.router.navigate(['/races']).then(() => window.location.reload()));
+  }
+
+  createTeam() {
+    this.teamService.createTeam(this.team)
+      .subscribe(() => this.router.navigate(['/teams']).then(() => window.location.reload()));
+  }
+
+  getAllTeams() {
+    this.teamService.getTeams().subscribe(data => {
+      this.Teams = data;
+      console.log(this.Teams);
       this.getAllCountries();
-    }
+    });
+  }
 
-    createCircuit() {
-      this.circuitService.createCircuit({
-        name: this.circuit!.name,
-        length: this.circuit!.length,
-        location: this.circuit!.location,
-        last_winner: this.selectedPilotC?.id,
-        country: this.selectedCountryC?.id
-      }).subscribe(data => {
-        console.log(data);
-      });
-      this.router.navigate(['/circuits']);
-    }
+  getAllCountries() {
+    this.countryService.getCountries().subscribe(data => {
+      this.Countries = data;
+      console.log(this.Countries);
+    });
+  }
 
-    getAllCircuits() {
-      this.circuitService.getCircuits().subscribe(data => {
-        this.Circuits = data;
-        console.log(this.Circuits);
-      });
+  newPilot() {
+    let id_c = [];
+    for (let c of this.selectedCountryP!) {
+      id_c.push(c.id);
     }
-
-    createRace() {
-      this.raceService.createRace({
-        name: this.race!.name,
-        date: this.race!.date,
-        season: this.race!.season,
-        fast_lap: this.race!.fast_lap,
-        circuit: this.selectedCircuitR?.id
-      }).subscribe(data => {
-        console.log(data);
-      });
-      this.router.navigate(['/races']);
-    }
-
-    createTeam() {
-      this.teamService.createTeam(this.team).subscribe(data => {
-        console.log(data);
-      });
-      this.router.navigate(['/teams']);
-    }
-
-    getAllTeams() {
-      this.teamService.getTeams().subscribe(data => {
-        this.Teams = data;
-        console.log(this.Teams);
-        this.getAllCountries();
-      });
-    }
-
-    getAllCountries() {
-      this.countryService.getCountries().subscribe(data => {
-        this.Countries = data;
-        console.log(this.Countries);
-      });
-    }
-
-    newPilot() {
-      let id_c = [];
-      for (let c of this.selectedCountryP!){
-        id_c.push(c.id);
-      }
-      this.pilotService.createPilot({
-        name: this.pilot!.name,
-        date: this.pilot!.date,
-        victories: this.pilot!.victories,
-        pole_positions: this.pilot!.pole_positions,
-        podiums: this.pilot!.podiums,
-        championships: this.pilot!.championships,
-        contract: this.pilot!.contract,
-        entry_year: this.pilot!.entry_year,
-        team: this.selectedTeamP?.id,
-        country: id_c}).subscribe(data => {
-        console.log(data);
-      });
-      this.router.navigate(['/pilots']);
-    }
-
-  //onFileSelectedP(event: Event) {
-  //  const reader = new FileReader();
-  //  // @ts-ignore
-  //  const file = event.target.files[0];
-  //  reader.readAsDataURL(file);
-  //  reader.onload = () => {
-  //    this.pilot.image = reader.result as string;
-  //    console.log(this.pilot.image);
-  //  };
-  //  // @ts-ignore
-  //  //let file = event.target.files[0];
-  //  //this.pilot!.image = file;
-  //}
+    this.pilotService.createPilot({
+      name: this.pilot!.name,
+      date: this.pilot!.date,
+      victories: this.pilot!.victories,
+      pole_positions: this.pilot!.pole_positions,
+      podiums: this.pilot!.podiums,
+      championships: this.pilot!.championships,
+      contract: this.pilot!.contract,
+      entry_year: this.pilot!.entry_year,
+      team: this.selectedTeamP?.id,
+      country: id_c
+    })
+      .subscribe(() => this.router.navigate(['/pilots']).then(() => window.location.reload()));
+  }
 }

@@ -47,7 +47,7 @@ export class TeamComponent {
   getTeam() {
     this.teamService.getTeam(this.teamId!).subscribe(data => {
       this.team = data.team;
-      this.team!.teamleader = data.teamleader;
+      this.team!.teamleader = data.teamleader[0];
       this.team!.points = data.points.points;
       this.team!.is_fav = data.is_fav.is_fav;
       this.header = data.header.header;
@@ -60,7 +60,10 @@ export class TeamComponent {
   getTeamImage() {
     this.teamService.getTeamImage(this.teamId!).subscribe(
       image => {
-        this.team!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+        if (image.type == 'text/html')
+          this.team!.image = 'assets/images/team-default.jpg';
+        else
+          this.team!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
       });
   }
 

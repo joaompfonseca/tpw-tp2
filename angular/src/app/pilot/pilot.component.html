@@ -1,4 +1,4 @@
-<div *ngIf="header && user && pilot && pilot.image && results && points; else loader">
+<div *ngIf="header && user && pilot && pilot.image; else loader">
   <div class="row">
     <h2>{{ header }}</h2>
     <div *ngIf="user.is_authenticated">
@@ -40,7 +40,7 @@
         </ng-container>
       </p>
     </div>
-    <div class="col-lg-6 col-md-6 col-sm-12" *ngIf="results.length > 0">
+    <div class="col-lg-6 col-md-6 col-sm-12" *ngIf="results && results.length > 0">
       <h4 style="padding-bottom: 20px">Pilot's Results</h4>
       <table style="border-collapse: separate; border-spacing: 1em; color: white">
         <tr>

@@ -50,7 +50,10 @@ export class ProfileComponent implements OnInit {
     for (let p of this.profile!.favourite_pilot) {
       this.pilotService.getPilotImage(p.id).subscribe(
         image => {
-          p.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+          if (image.type == 'text/html')
+            p.image = 'assets/images/pilot-default.jpg';
+          else
+            p.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
         });
     }
   }
@@ -59,7 +62,10 @@ export class ProfileComponent implements OnInit {
     for (let t of this.profile!.favourite_team) {
       this.teamService.getTeamImage(t.id).subscribe(
         image => {
-          t.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+          if (image.type == 'text/html')
+            t.image = 'assets/images/team-default.jpg';
+          else
+            t.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
         });
     }
   }

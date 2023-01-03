@@ -71,7 +71,10 @@ export class PilotComponent implements OnInit {
   getPilotImage() {
     this.pilotService.getPilotImage(this.pilotId!).subscribe(
       image => {
-        this.pilot!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+        if (image.type == 'text/html')
+          this.pilot!.image = 'assets/images/teamleader-default.jpg';
+        else
+          this.pilot!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
       });
   }
 

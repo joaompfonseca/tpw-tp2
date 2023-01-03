@@ -30,7 +30,7 @@ export class ProfileService {
 
   updateProfile(profile: Profile): Observable<any> {
     const url = this.baseURL + 'profileupdate';
-    return this.http.put(url, profile, httpOptions);
+    return this.http.put(url, profile, {withCredentials: true});
   }
 
   toggleFavouritePilot(id: number, bool: boolean): Observable<any> {

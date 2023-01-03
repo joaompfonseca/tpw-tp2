@@ -50,7 +50,10 @@ export class TeamleaderComponent implements OnInit {
   getTeamleaderImage() {
     this.teamleaderService.getTeamleaderImage(this.teamleaderId!).subscribe(
       image => {
-        this.teamleader!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+        if (image.type == 'text/html')
+          this.teamleader!.image = 'assets/images/pilot-default.jpg';
+        else
+          this.teamleader!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
       });
   }
 }

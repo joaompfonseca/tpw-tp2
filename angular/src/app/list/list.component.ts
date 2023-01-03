@@ -7,6 +7,8 @@ import {CircuitService} from "../../services/circuit/circuit.service";
 import {CarService} from "../../services/car/car.service";
 import {CountryService} from "../../services/country/country.service";
 import {TeamLeaderService} from "../../services/teamleader/team-leader.service";
+import {UserService} from "../../services/user/user.service";
+import {User} from "../../interfaces/user";
 
 @Component({
   selector: 'app-list',
@@ -16,6 +18,7 @@ import {TeamLeaderService} from "../../services/teamleader/team-leader.service";
 export class ListComponent implements OnInit {
 
   header: string;
+  user: User | undefined;
   actions: { url: string, str: string }[];
   list: { url: string, str: string }[][];
   query?: string;
@@ -29,7 +32,8 @@ export class ListComponent implements OnInit {
               private circuitService: CircuitService,
               private carService: CarService,
               private countryService: CountryService,
-              private teamleaderService: TeamLeaderService) {
+              private teamleaderService: TeamLeaderService,
+              private userService: UserService) {
     this.header = '';
     this.type = '';
     this.actions = [
@@ -39,7 +43,9 @@ export class ListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.type = this.route.snapshot.data['type'];
+    this.type = this.route.snapshot.data['type']
+
+    this.getUser();
 
     switch (this.type) {
       case 'pilot':
@@ -98,8 +104,8 @@ export class ListComponent implements OnInit {
         this.getTeamleaders();
         break;
 
-  }
     }
+  }
 
   getPilots() {
     this.pilotService.getPilots().subscribe(pilots => {
@@ -107,62 +113,64 @@ export class ListComponent implements OnInit {
         return [{url: '/pilots/' + pilot.id, str: pilot.name}];
       });
     });
-    }
+  }
 
-    getTeams() {
-      this.teamService.getTeams().subscribe(teams => {
-          this.list = teams.map((team) => {
-            return [{url: '/teams/' + team.id, str: team.name}];
-          });
-        }
-      );
-    }
-
-    getRaces() {
-    this.raceService.getRaces().subscribe( races => {
-      this.list = races.map((race) => {
-        return [{url: '/races/' + race.id, str: race.name}];
-      });
-    }
+  getTeams() {
+    this.teamService.getTeams().subscribe(teams => {
+        this.list = teams.map((team) => {
+          return [{url: '/teams/' + team.id, str: team.name}];
+        });
+      }
     );
-    }
+  }
 
-    getCircuits() {
-    this.circuitService.getCircuits().subscribe( circuits => {
-      this.list = circuits.map((circuit) => {
-        return [{url: '/circuits/' + circuit.id, str: circuit.name}];
-      });
-    }
+  getRaces() {
+    this.raceService.getRaces().subscribe(races => {
+        this.list = races.map((race) => {
+          return [{url: '/races/' + race.id, str: race.name}];
+        });
+      }
     );
-    }
+  }
 
-    getCars() {
-    this.carService.getCars().subscribe( cars => {
-      this.list = cars.map((car) => {
-        return [{url: '/cars/' + car.id, str: car.model}];
-      });
-    }
+  getCircuits() {
+    this.circuitService.getCircuits().subscribe(circuits => {
+        this.list = circuits.map((circuit) => {
+          return [{url: '/circuits/' + circuit.id, str: circuit.name}];
+        });
+      }
     );
-    }
+  }
 
-    getCountries() {
-    this.countryService.getCountries().subscribe( countries => {
-      this.list = countries.map((country) => {
-        return [{url: '/countries/' + country.id, str: country.designation}];
-      });
-    }
+  getCars() {
+    this.carService.getCars().subscribe(cars => {
+        this.list = cars.map((car) => {
+          return [{url: '/cars/' + car.id, str: car.model}];
+        });
+      }
     );
-    }
+  }
 
-    getTeamleaders() {
-    this.teamleaderService.getTeamleaders().subscribe( teamleaders => {
+  getCountries() {
+    this.countryService.getCountries().subscribe(countries => {
+        this.list = countries.map((country) => {
+          return [{url: '/countries/' + country.id, str: country.designation}];
+        });
+      }
+    );
+  }
+
+  getTeamleaders() {
+    this.teamleaderService.getTeamleaders().subscribe(teamleaders => {
       this.list = teamleaders.map((teamleader) => {
         return [{url: '/teamleaders/' + teamleader.id, str: teamleader.name}];
       });
-    }
-    );
-    }
+    });
+  }
 
-
-
+  getUser() {
+    this.userService.getUser().subscribe(user => {
+      this.user = user;
+    });
+  }
 }
