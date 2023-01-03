@@ -115,6 +115,17 @@ class ProfileSerializer(serializers.Serializer):
     favourite_pilot = SimplePilotSerializer(many=True)
     favourite_team = SimpleTeamSerializer(many=True)
 
+    def update(self, instance, validated_data):
+        if isinstance(instance, Profile):
+            instance.biography = validated_data.get('biography', instance.biography)
+            instance.save()
+        elif isinstance(instance, User):
+            instance.biography = validated_data.user.get('first_name', instance.first_name)
+            instance.biography = validated_data.user.get('last_name', instance.last_name)
+            instance.biography = validated_data.user.get('last_name', instance.last_name)
+            instance.save()
+        return instance
+
 
 class FavSerializer(serializers.Serializer):
     is_fav = serializers.BooleanField()

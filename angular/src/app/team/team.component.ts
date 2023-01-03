@@ -5,6 +5,7 @@ import {Pilot} from "../../interfaces/pilot";
 import {ActivatedRoute} from "@angular/router";
 import {TeamService} from "../../services/team/team.service";
 import {DomSanitizer} from "@angular/platform-browser";
+import {ProfileService} from "../../services/profile/profile.service";
 
 @Component({
   selector: 'app-team',
@@ -27,6 +28,7 @@ export class TeamComponent {
   constructor(
     private route: ActivatedRoute,
     private teamService: TeamService,
+    private profileService: ProfileService,
     private sanitizer: DomSanitizer
   ) {
   }
@@ -47,6 +49,7 @@ export class TeamComponent {
       this.team = data.team;
       this.team!.teamleader = data.teamleader;
       this.team!.points = data.points.points;
+      this.team!.is_fav = data.is_fav.is_fav;
       this.header = data.header.header;
       this.pilots = data.pilots;
       this.user = data.auth;
@@ -61,9 +64,9 @@ export class TeamComponent {
       });
   }
 
-  addToFavourites() {
-  }
-
-  removeFromFavourites() {
+  toggleFavourite() {
+    const bool = !this.team!.is_fav;
+    this.team!.is_fav = bool;
+    this.profileService.toggleFavouriteTeam(this.teamId!, bool).subscribe();
   }
 }
