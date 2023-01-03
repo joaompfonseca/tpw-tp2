@@ -282,7 +282,7 @@ export class EditComponent implements OnInit {
     this.raceService.getRace(id).subscribe(data => {
       this.race = data.race;
       this.race!.circuit = data.circuit;
-      this.race!.fast_lap = data.race.fast_lap.substring(3);
+      this.race!.fast_lap = data.race.fast_lap;
       this.selectedCircuitR = data.circuit;
       this.getAllCircuits();
     });
