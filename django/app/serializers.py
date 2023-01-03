@@ -116,14 +116,15 @@ class ProfileSerializer(serializers.Serializer):
     favourite_team = SimpleTeamSerializer(many=True)
 
     def update(self, instance, validated_data):
-        if isinstance(instance, Profile):
-            instance.biography = validated_data.get('biography', instance.biography)
-            instance.save()
-        elif isinstance(instance, User):
-            instance.biography = validated_data.user.get('first_name', instance.first_name)
-            instance.biography = validated_data.user.get('last_name', instance.last_name)
-            instance.biography = validated_data.user.get('last_name', instance.last_name)
-            instance.save()
+        # User
+        user = User.objects.get(id=instance.user.id)
+        user.first_name = validated_data['user'].get('first_name', user.first_name)
+        user.last_name = validated_data['user'].get('last_name', user.last_name)
+        user.email = validated_data['user'].get('email', user.email)
+        user.save()
+        # Profile
+        instance.biography = validated_data.get('biography', instance.biography)
+        instance.save()
         return instance
 
 
