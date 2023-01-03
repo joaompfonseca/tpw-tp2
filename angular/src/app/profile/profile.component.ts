@@ -42,7 +42,10 @@ export class ProfileComponent implements OnInit {
 
   getProfileImage() {
     this.profileService.getProfileImage().subscribe(image => {
-      this.profile!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
+      if (image.type == 'text/html')
+        this.profile!.image = 'assets/images/profile-default.jpg';
+      else
+        this.profile!.image = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(image));
     });
   }
 

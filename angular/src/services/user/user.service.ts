@@ -16,6 +16,11 @@ export class UserService {
     return this.http.get<User>(url, {withCredentials: true});
   }
 
+  signup(username: string, email: string, password: string): Observable<User> {
+    const url = this.baseURL + 'signup';
+    return this.http.post<User>(url, {username: username, email: email, password: password}, {withCredentials: true});
+  }
+
   login(username: string, password: string): Observable<User> {
     const url = this.baseURL + 'login';
     return this.http.post<User>(url, {username: username, password: password}, {withCredentials: true});
