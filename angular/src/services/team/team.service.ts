@@ -19,17 +19,17 @@ export class TeamService {
 
   getTeam(id: number): Observable<any> {
     const url = this.baseURL + "team?id=" + id;
-    return this.http.get<any>(url, {withCredentials: true});
+    return this.http.get<any>(url, httpOptions);
   }
 
   getTeamImage(id: number): Observable<Blob> {
     const url = this.baseURL + "image/team/" + id;
-    return this.http.get(url, {responseType: 'blob'});
+    return this.http.get(url, {...httpOptions, responseType: 'blob'});
   }
 
   getTeams(): Observable<Team[]> {
     const url = this.baseURL + "teams";
-    return this.http.get<Team[]>(url);
+    return this.http.get<Team[]>(url, httpOptions);
   }
 
   createTeam(team: Team): Observable<any> {
@@ -39,7 +39,7 @@ export class TeamService {
 
   searchTeam(name: string): Observable<Team[]> {
     const url = this.baseURL + "teamsearch?name=" + name;
-    return this.http.get<Team[]>(url);
+    return this.http.get<Team[]>(url, httpOptions);
   }
 
   updateTeam(id: number, team: any): Observable<any>{

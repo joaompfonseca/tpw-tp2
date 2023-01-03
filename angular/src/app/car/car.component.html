@@ -2,12 +2,12 @@
   <h2>{{ header }}</h2>
   <br>
 
-  <ng-container *ngIf="user && user.is_authenticated && user.is_superuser">
+  <div *ngIf="user && user.is_authenticated && user.is_superuser">
     <p>
       <strong>Actions: </strong>
       <a routerLink="/cars/{{car.id}}/edit">Edit Car</a>
     </p>
-  </ng-container>
+  </div>
 
   <p><b>Model: </b>{{ car.model }}</p>
   <p><b>Engine: </b>{{ car.engine }}</p>

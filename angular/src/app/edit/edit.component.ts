@@ -14,7 +14,7 @@ import {Circuit} from "../../interfaces/circuit";
 import {Country} from "../../interfaces/country";
 import {Car} from "../../interfaces/car";
 import {TeamLeader} from "../../interfaces/teamleader";
-import { Router } from '@angular/router';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-edit',
@@ -114,7 +114,7 @@ export class EditComponent implements OnInit {
   }
 
   getTeamLeader() {
-  let id = this.route.snapshot.params['id'];
+    let id = this.route.snapshot.params['id'];
     this.teamleaderService.getTeamleader(id).subscribe(data => {
       this.teamleader = data.teamleader;
       this.teamleader!.team = data.team;
@@ -123,7 +123,7 @@ export class EditComponent implements OnInit {
     });
   }
 
-  getAllTeamsL(){
+  getAllTeamsL() {
     this.teamService.getTeams().subscribe(data => {
       this.Teams = [];
       for (let t of data) {
@@ -139,10 +139,8 @@ export class EditComponent implements OnInit {
     this.teamleaderService.updateTeamLeader(this.teamleader!.id, {
       name: this.teamleader!.name,
       team: this.selectedTeamTL!.id
-    }).subscribe(data => {
-      console.log(data);
-    });
-    this.router.navigate(['/teamleaders/' + this.teamleader!.id]);
+    })
+      .subscribe(() => this.router.navigate(['/teamleaders/' + this.teamleader!.id]).then(() => window.location.reload()));
   }
 
   getCountry() {
@@ -154,14 +152,12 @@ export class EditComponent implements OnInit {
   }
 
   updateCountry() {
-    this.countryService.updateCountry(this.country!.id,this.country!).subscribe(data => {
-      console.log(data);
-    });
-    this.router.navigate(['/countries/' + this.country!.id]);
+    this.countryService.updateCountry(this.country!.id, this.country!)
+      .subscribe(() => this.router.navigate(['/countries/' + this.country!.id]).then(() => window.location.reload()));
   }
 
 
-  getCar(){
+  getCar() {
     let id = this.route.snapshot.params['id'];
     this.carService.getCar(id).subscribe(data => {
       this.car = data.car;
@@ -172,7 +168,7 @@ export class EditComponent implements OnInit {
     })
   }
 
-  getAllPilotsCar(){
+  getAllPilotsCar() {
     this.pilotService.getPilots().subscribe(data => {
       this.Pilots = [];
       for (let t of data) {
@@ -192,10 +188,8 @@ export class EditComponent implements OnInit {
       engine: this.car!.engine,
       weight: this.car!.weight,
       pilot: this.selectedPilotCar!.id
-    }).subscribe(data => {
-      console.log(data);
-    });
-    this.router.navigate(['/cars/' + this.car!.id]);
+    })
+      .subscribe(() => this.router.navigate(['/cars/' + this.car!.id]).then(() => window.location.reload()));
   }
 
   getPilot() {
@@ -226,7 +220,7 @@ export class EditComponent implements OnInit {
     this.countryService.getCountries().subscribe(data => {
       let temp = data;
       let ids = [];
-      for (let t of this.pilot!.country!){
+      for (let t of this.pilot!.country!) {
         ids.push(t.id);
       }
       this.Countries = [];
@@ -235,8 +229,7 @@ export class EditComponent implements OnInit {
         if (!ids.includes(t.id)) {
           console.log(t);
           this.Countries.push(t);
-        }
-        else {
+        } else {
           ct.push(t);
         }
       }
@@ -248,10 +241,10 @@ export class EditComponent implements OnInit {
 
   updatePilot() {
     let id_c = [];
-    for (let c of this.selectedCountryP!){
+    for (let c of this.selectedCountryP!) {
       id_c.push(c.id);
     }
-    this.pilotService.updatePilot(this.pilot!.id,{
+    this.pilotService.updatePilot(this.pilot!.id, {
       name: this.pilot!.name,
       date: this.pilot!.date,
       victories: this.pilot!.victories,
@@ -261,10 +254,9 @@ export class EditComponent implements OnInit {
       contract: this.pilot!.contract,
       entry_year: this.pilot!.entry_year,
       team: this.selectedTeamP?.id,
-      country: id_c}).subscribe(data => {
-      console.log(data);
-    });
-    this.router.navigate(['/pilots/' + this.pilot!.id]);
+      country: id_c
+    })
+      .subscribe(() => this.router.navigate(['/pilots/' + this.pilot!.id]).then(() => window.location.reload()));
   }
 
   getTeam() {
@@ -281,10 +273,8 @@ export class EditComponent implements OnInit {
       name: this.team!.name,
       date: this.team!.date,
       championships: this.team!.championships,
-    }).subscribe(data => {
-      console.log(data);
-    });
-    this.router.navigate(['/teams/' + this.team!.id]);
+    })
+      .subscribe(() => this.router.navigate(['/teams/' + this.team!.id]).then(() => window.location.reload()));
   }
 
   getRace() {
@@ -310,16 +300,14 @@ export class EditComponent implements OnInit {
   }
 
   updateRace() {
-    this.raceService.updateRace(this.race!.id,{
+    this.raceService.updateRace(this.race!.id, {
       name: this.race!.name,
       date: this.race!.date,
       season: this.race!.season,
       fast_lap: this.race!.fast_lap,
       circuit: this.selectedCircuitR?.id,
-    }).subscribe(data => {
-      console.log(data);
-    });
-    this.router.navigate(['/races/' + this.race!.id]);
+    })
+      .subscribe(() => this.router.navigate(['/races/' + this.race!.id]).then(() => window.location.reload()));
   }
 
   getCircuit() {
@@ -364,10 +352,8 @@ export class EditComponent implements OnInit {
       location: this.circuit!.location,
       last_winner: this.selectedPilotC?.id,
       country: this.selectedCountryC?.id,
-    }).subscribe(data => {
-      console.log(data);
-    });
-    this.router.navigate(['/circuits/' + this.circuit!.id]);
+    })
+      .subscribe(() => this.router.navigate(['/circuits/' + this.circuit!.id]).then(() => window.location.reload()));
   }
 }
 

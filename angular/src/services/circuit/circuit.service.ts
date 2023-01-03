@@ -18,12 +18,12 @@ export class CircuitService {
 
   getCircuit(id: number): Observable<any> {
     const url = this.baseURL + "circuit?id=" + id;
-    return this.http.get<any>(url);
+    return this.http.get<any>(url, httpOptions);
   }
 
   getCircuits(): Observable<Circuit[]> {
     const url = this.baseURL + "circuits";
-    return this.http.get<Circuit[]>(url);
+    return this.http.get<Circuit[]>(url, httpOptions);
   }
 
   createCircuit(circuit: any): Observable<any> {
@@ -33,7 +33,7 @@ export class CircuitService {
 
   searchCircuit(name: string): Observable<Circuit[]> {
     const url = this.baseURL + "circuitsearch?name=" + name;
-    return this.http.get<Circuit[]>(url);
+    return this.http.get<Circuit[]>(url, httpOptions);
     }
 
   updateCircuit(id: number, circuit: any): Observable<any>{

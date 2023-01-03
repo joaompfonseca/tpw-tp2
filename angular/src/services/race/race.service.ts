@@ -17,12 +17,12 @@ export class RaceService {
 
   getRace(id: number): Observable<any> {
     const url = this.baseURL + "race?id=" + id;
-    return this.http.get<any>(url);
+    return this.http.get<any>(url, httpOptions);
   }
 
   getRaces(): Observable<Race[]> {
     const url = this.baseURL + "races";
-    return this.http.get<Race[]>(url);
+    return this.http.get<Race[]>(url, httpOptions);
   }
 
   createRace(race: any): Observable<any> {
@@ -32,7 +32,7 @@ export class RaceService {
 
   searchRace(name: string): Observable<Race[]> {
     const url = this.baseURL + "racesearch?name=" + name;
-    return this.http.get<Race[]>(url);
+    return this.http.get<Race[]>(url, httpOptions);
   }
 
   updateRace(id: number, race: any): Observable<any>{

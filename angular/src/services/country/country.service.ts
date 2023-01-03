@@ -18,12 +18,12 @@ export class CountryService {
 
   getCountry(id: number): Observable<any> {
     const url = this.baseURL + "country?id=" + id;
-    return this.http.get<any>(url);
+    return this.http.get<any>(url, httpOptions);
   }
 
   getCountries(): Observable<Country[]> {
     const url = this.baseURL + "countries";
-    return this.http.get<Country[]>(url);
+    return this.http.get<Country[]>(url, httpOptions);
   }
 
   createCountry(country: any): Observable<any> {
@@ -33,7 +33,7 @@ export class CountryService {
 
   searchCountry(name: string): Observable<Country[]> {
     const url = this.baseURL + "countrysearch?name=" + name;
-    return this.http.get<Country[]>(url);
+    return this.http.get<Country[]>(url, httpOptions);
   }
 
   updateCountry(id: number, country: Country): Observable<any>{

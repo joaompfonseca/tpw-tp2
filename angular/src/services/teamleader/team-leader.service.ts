@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {TeamLeader} from "../../interfaces/teamleader"
 import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 
 
-
 const httpOptions = {
-  headers: new HttpHeaders({'Content-Type': 'application/json','X-CSRFToken': 'aP9qIM0VOffwZmznMsPhoYuU5tAfYUJVTvCZWjROyVuJ6WheSFHL1HyW25MOvwcp'}),
+  headers: new HttpHeaders({'Content-Type': 'application/json'}),
   withCredentials: true
 };
 
@@ -15,21 +14,23 @@ const httpOptions = {
 })
 export class TeamLeaderService {
   private baseURL = 'http://localhost:8000/ws/';
-  constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient) {
+  }
 
   getTeamleader(id: number): Observable<any> {
     const url = this.baseURL + "teamleader?id=" + id;
-    return this.http.get<any>(url);
+    return this.http.get<any>(url, httpOptions);
   }
 
   getTeamleaderImage(id: number): Observable<Blob> {
     const url = this.baseURL + "image/teamleader/" + id;
-    return this.http.get(url, {responseType: 'blob'});
+    return this.http.get(url, {...httpOptions, responseType: 'blob'});
   }
 
   getTeamleaders(): Observable<TeamLeader[]> {
     const url = this.baseURL + "teamleaders";
-    return this.http.get<TeamLeader[]>(url);
+    return this.http.get<TeamLeader[]>(url, httpOptions);
   }
 
   createTeamLeader(teamleader: any): Observable<any> {
@@ -39,10 +40,10 @@ export class TeamLeaderService {
 
   searchTeamLeader(name: string): Observable<TeamLeader[]> {
     const url = this.baseURL + "teamleadersearch?name=" + name;
-    return this.http.get<TeamLeader[]>(url);
+    return this.http.get<TeamLeader[]>(url, httpOptions);
   }
 
-  updateTeamLeader(id: number, teamleader: any): Observable<any>{
+  updateTeamLeader(id: number, teamleader: any): Observable<any> {
     const url = this.baseURL + "teamleaderupdate?id=" + id;
     return this.http.put(url, teamleader, httpOptions);
   }

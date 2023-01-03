@@ -20,19 +20,17 @@ export class PilotService {
 
   getPilot(id: number): Observable<any> {
     const url = this.baseURL + "pilot?id=" + id;
-    let pilot: Observable<any> = this.http.get<any>(url, {withCredentials: true});
-    return pilot;
+    return this.http.get<any>(url, httpOptions);
   }
 
   getPilotImage(id: number): Observable<Blob> {
     const url = this.baseURL + "image/pilot/" + id;
-    return this.http.get(url, {responseType: 'blob'});
+    return this.http.get(url, {...httpOptions, responseType: 'blob'});
   }
 
   getPilots(): Observable<Pilot[]> {
     const url = this.baseURL + "pilots";
-    let pilots: Observable<Pilot[]> = this.http.get<Pilot[]>(url);
-    return pilots;
+    return this.http.get<Pilot[]>(url, httpOptions);
   }
 
   createPilot(pilot: any): Observable<any> {
@@ -42,7 +40,7 @@ export class PilotService {
 
   searchPilot(name: string): Observable<Pilot[]> {
     const url = this.baseURL + "pilotsearch?name=" + name;
-    return this.http.get<Pilot[]>(url);
+    return this.http.get<Pilot[]>(url, httpOptions);
   }
 
   updatePilot(id: number, pilot: any): Observable<any> {

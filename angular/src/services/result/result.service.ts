@@ -17,7 +17,7 @@ export class ResultService {
 
   getResult(id: number): Observable<Result> {
     const url = this.baseURL + "result?id=" + id;
-    return this.http.get<Result>(url);
+    return this.http.get<Result>(url, httpOptions);
   }
 
   createResult(result: Result): Observable<any> {

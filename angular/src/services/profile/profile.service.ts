@@ -20,26 +20,26 @@ export class ProfileService {
 
   getProfile(): Observable<Profile> {
     const url = this.baseURL + 'profile';
-    return this.http.get<Profile>(url, {withCredentials: true});
+    return this.http.get<Profile>(url, httpOptions);
   }
 
   getProfileImage(): Observable<Blob> {
     const url = this.baseURL + "image/profile";
-    return this.http.get(url, {withCredentials: true, responseType: 'blob'});
+    return this.http.get(url, {...httpOptions, responseType: 'blob'});
   }
 
   updateProfile(profile: Profile): Observable<any> {
     const url = this.baseURL + 'profileupdate';
-    return this.http.put(url, profile, {withCredentials: true});
+    return this.http.put(url, profile, httpOptions);
   }
 
   toggleFavouritePilot(id: number, bool: boolean): Observable<any> {
     const url = this.baseURL + 'pilotfav' + ((bool) ? 'add' : 'rem') + '?id=' + id;
-    return this.http.post(url, {}, {withCredentials: true});
+    return this.http.post(url, {}, httpOptions);
   }
 
   toggleFavouriteTeam(id: number, bool: boolean): Observable<any> {
     const url = this.baseURL + 'teamfav' + ((bool) ? 'add' : 'rem') + '?id=' + id;
-    return this.http.post(url, {}, {withCredentials: true});
+    return this.http.post(url, {}, httpOptions);
   }
 }

@@ -18,12 +18,12 @@ export class CarService {
 
   getCar(id: number): Observable<any> {
     const url = this.baseURL + "car?id=" + id;
-    return this.http.get<any>(url);
+    return this.http.get<any>(url, httpOptions);
   }
 
   getCars(): Observable<Car[]> {
     const url = this.baseURL + "cars";
-    return this.http.get<Car[]>(url);
+    return this.http.get<Car[]>(url, httpOptions);
   }
 
   createCar(car: any): Observable<any> {
@@ -34,20 +34,20 @@ export class CarService {
   searchCar(model?: string, pilot?: string): Observable<Car[]> {
     if (model && pilot) {
       const url = this.baseURL + "carsearch?model=" + model + "&pilot=" + pilot;
-      return this.http.get<Car[]>(url);
+      return this.http.get<Car[]>(url, httpOptions);
     }
 
     if (model && !pilot) {
       const url = this.baseURL + "carsearch?model=" + model;
-      return this.http.get<Car[]>(url);
+      return this.http.get<Car[]>(url, httpOptions);
     }
 
     if (pilot && !model) {
       const url = this.baseURL + "carsearch?pilot=" + pilot;
-      return this.http.get<Car[]>(url);
+      return this.http.get<Car[]>(url, httpOptions);
     }
     const url = this.baseURL + "carsearch?model=''&pilot=''";
-    return this.http.get<Car[]>(url);
+    return this.http.get<Car[]>(url, httpOptions);
   }
 
   updateCar(id: number, car: any): Observable<any>{
